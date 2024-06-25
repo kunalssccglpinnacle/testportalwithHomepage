@@ -6,23 +6,26 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -48,9 +51,7 @@ class TestPortalActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun TestPortalScreen(navController: NavHostController, viewModel: TestPortalViewModel = viewModel()) {
-    Scaffold(
-
-    ) {
+    Scaffold {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -101,33 +102,73 @@ fun AutoScrollableCarousel(imageResIds: List<Int>) {
 
     LaunchedEffect(key1 = currentIndex) {
         coroutineScope.launch {
-            delay(3000) // Delay for 3 seconds
+            delay(3000) // Delay for 1.5 seconds
             currentIndex = (currentIndex + 1) % imageResIds.size
         }
     }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp),
-        contentAlignment = Alignment.Center
+            .height(250.dp), // Set height to ensure dots visibility
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        LazyRow(
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp),
+            contentAlignment = Alignment.Center
         ) {
-            itemsIndexed(imageResIds) { index, imageResId ->
-                if (index == currentIndex) {
-                    Image(
-                        painter = painterResource(id = imageResId),
-                        contentDescription = "Carousel Image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .padding(horizontal = 16.dp)
-                    )
+            LazyRow(
+                modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                itemsIndexed(imageResIds) { index, imageResId ->
+                    if (index == currentIndex) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Image(
+                                painter = painterResource(id = imageResId),
+                                contentDescription = "Carousel Image",
+                                contentScale = ContentScale.Crop, // Adjust image scaling
+                                modifier = Modifier
+                                    .size(200.dp) // Adjust image size to match screenshot
+                                    .padding(horizontal = 16.dp)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Mock Tests, PYP, Chapter wise, Sectional Tests, result oriented",
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = 12.dp)
+                            )
+                        }
+                    }
                 }
+            }
+        }
+
+        // Dots indicator
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            imageResIds.forEachIndexed { index, _ ->
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .padding(2.dp)
+                        .background(
+                            color = if (index == currentIndex) Color.Black else Color.Gray,
+                            shape = CircleShape
+                        )
+                )
             }
         }
     }
@@ -147,57 +188,46 @@ fun ExamCategorySection(navController: NavHostController) {
             fontSize = 14.sp,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-        Row(
+        LazyRow(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp)
         ) {
-            ExamCategoryCard(
-                imageRes = R.drawable.ssc_logo_final,
-                text = "SSC Exams",
-                onClick = { navController.navigate("test_pass") }
-            )
-            ExamCategoryCard(
-                imageRes = R.drawable.ssc_logo_final,
-                text = "Delhi Police Exams",
-                onClick = { /* Handle click */ }
-            )
-            ExamCategoryCard(
-                imageRes = R.drawable.railway_logo_final,
-                text = "Railway Exams",
-                onClick = { /* Handle click */ }
-            )
+            item {
+                ExamCategoryCard(
+                    imageRes = R.drawable.ssc_logo_final,
+                    text = "SSC Exams",
+                    onClick = { navController.navigate("test_pass") }
+                )
+            }
+            item {
+                ExamCategoryCard(
+                    imageRes = R.drawable.img_1,
+                    text = "Delhi Police Exams",
+                    onClick = { navController.navigate("test_pass") }
+                )
+            }
+            item {
+                ExamCategoryCard(
+                    imageRes = R.drawable.railway_logo_final,
+                    text = "Railway Exams",
+                    onClick = { navController.navigate("test_pass") }
+                )
+            }
         }
     }
 }
 
 @Composable
 fun ExamCategoryCard(imageRes: Int, text: String, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .width(120.dp)
-            .height(120.dp)
-            .clickable { onClick() },
-        shape = RoundedCornerShape(8.dp),
-        elevation = 4.dp
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Image(
-                painter = painterResource(id = imageRes),
-                contentDescription = text,
-                modifier = Modifier.size(48.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = text,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
+    CustomCard(
+        imageRes = imageRes,
+        text = text,
+        onClick = onClick,
+        cardWidth = 160.dp, // Reduced size
+        cardHeight = 160.dp, // Reduced size
+        imageSize = 64.dp // Reduced size
+    )
 }
 
 @Composable
@@ -220,29 +250,43 @@ fun AllTestsSection() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            TestCategoryRadioButton("SSC", selectedCategory) { selectedCategory = it }
-            TestCategoryRadioButton("Delhi Police", selectedCategory) { selectedCategory = it }
-            TestCategoryRadioButton("Railway", selectedCategory) { selectedCategory = it }
+            CustomRadioButtonCard(
+                text = "SSC",
+                selectedCategory = selectedCategory,
+                onClick = { selectedCategory = it }
+            )
+            CustomRadioButtonCard(
+                text = "Delhi Police",
+                selectedCategory = selectedCategory,
+                onClick = { selectedCategory = it }
+            )
+            CustomRadioButtonCard(
+                text = "Railway",
+                selectedCategory = selectedCategory,
+                onClick = { selectedCategory = it }
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            TestCard("SSC CGL Tier 1") { /* Handle click */ }
-            TestCard("SSC CGL Tier 2") { /* Handle click */ }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            TestCard("SSC CHSL Tier 1") { /* Handle click */ }
-            TestCard("SSC CHSL Tier 2") { /* Handle click */ }
+        val tests = when (selectedCategory) {
+            "SSC" -> listOf("SSC CGL Tier 1", "SSC CGL Tier 2", "SSC CHSL Tier 1", "SSC CHSL Tier 2", "SSC MTS Tier 1")
+            "Delhi Police" -> listOf("Delhi Police Constable", "Delhi Police Head Constable", "Delhi Police SI")
+            "Railway" -> listOf("RRB NTPC", "RRB Group D", "RRB ALP")
+            else -> emptyList()
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        tests.chunked(2).forEach { rowTests ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                rowTests.forEach { test ->
+                    TestCard(testName = test) { /* Handle test card click */ }
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         Text(
             text = "View All ->",
@@ -254,48 +298,41 @@ fun AllTestsSection() {
 }
 
 @Composable
-fun TestCategoryRadioButton(text: String, selectedCategory: String, onClick: (String) -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.clickable { onClick(text) }
+fun CustomRadioButtonCard(
+    text: String,
+    selectedCategory: String,
+    onClick: (String) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .width(100.dp)
+            .height(50.dp) // Reduced size
+            .clickable { onClick(text) }
+            .background(
+                color = if (selectedCategory == text) Color.Blue else Color.LightGray,
+                shape = RoundedCornerShape(20.dp)
+            ),
+        contentAlignment = Alignment.Center
     ) {
-        RadioButton(
-            selected = selectedCategory == text,
-            onClick = { onClick(text) }
+        Text(
+            text = text,
+            color = if (selectedCategory == text) Color.White else Color.Black,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
-        Text(text = text)
     }
 }
 
 @Composable
 fun TestCard(testName: String, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .width(150.dp)
-            .height(100.dp)
-            .padding(8.dp)
-            .clickable { onClick() },
-        shape = RoundedCornerShape(8.dp),
-        elevation = 4.dp
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ssc_logo_final),
-                contentDescription = testName,
-                modifier = Modifier.size(48.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = testName,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
+    CustomCard(
+        imageRes = R.drawable.railway_logo_final,
+        text = testName,
+        onClick = onClick,
+        cardWidth = 160.dp, // Reduced size
+        cardHeight = 160.dp, // Reduced size
+        imageSize = 64.dp // Reduced size
+    )
 }
 
 @Composable
@@ -324,4 +361,85 @@ fun PinnacleTestPassSection() {
         Text(text = "• Chapter wise Tests")
         Text(text = "• Misc. Tests")
     }
+}
+
+@Composable
+fun TestCategoryScreen() {
+    var selectedCategory by remember { mutableStateOf("SSC") }
+    val categories = listOf("SSC", "Delhi Police", "Railway")
+
+    val categoryToTests = mapOf(
+        "SSC" to listOf("SSC CGL Tier 1", "SSC CGL Tier 2", "SSC CHSL Tier 1", "SSC CHSL Tier 2", "SSC MTS Tier 1", "SSC MTS Tier 1"),
+        "Delhi Police" to listOf("Delhi Police Constable", "Delhi Police Head Constable", "Delhi Police SI"),
+        "Railway" to listOf("RRB NTPC", "RRB Group D", "RRB ALP", "RRB ALP")
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        categories.forEach { category ->
+            CustomRadioButtonCard(
+                text = category,
+                selectedCategory = selectedCategory,
+                onClick = { selectedCategory = it }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val tests = categoryToTests[selectedCategory] ?: emptyList()
+        tests.forEach { test ->
+            TestCard(
+                testName = test,
+                onClick = { /* Handle test card click */ }
+            )
+        }
+    }
+}
+
+@Composable
+fun CustomCard(
+    imageRes: Int,
+    text: String,
+    onClick: () -> Unit,
+    cardWidth: Dp,
+    cardHeight: Dp,
+    imageSize: Dp
+) {
+    Card(
+        modifier = Modifier
+            .width(cardWidth)
+            .height(cardHeight)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(8.dp),
+        elevation = 4.dp
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = text,
+                modifier = Modifier.size(imageSize)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = text,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewTestCategoryScreen() {
+    TestCategoryScreen()
 }

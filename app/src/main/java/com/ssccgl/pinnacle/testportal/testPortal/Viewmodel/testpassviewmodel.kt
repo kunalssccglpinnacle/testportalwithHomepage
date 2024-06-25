@@ -3,6 +3,7 @@ package com.ssccgl.pinnacle.testportal.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ssccgl.pinnacle.testportal.network.IndividualExamTestPass
 import com.ssccgl.pinnacle.testportal.network.RetrofitInstance
 import com.ssccgl.pinnacle.testportal.network.TestPass
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,15 +31,7 @@ class TestPassViewModel : ViewModel() {
         }
     }
 
-    fun joinTestPass(examId: Int) {
-        viewModelScope.launch {
-            try {
-                val response = RetrofitInstance.api.getIndividualExamTestPass(mapOf("exam_id" to examId))
-                Log.d("TestPassViewModel", "Joined test pass response: ${response.examData}")
-                // Handle the response as needed, for example, updating the UI or saving the data
-            } catch (e: Exception) {
-                Log.e("TestPassViewModel", "Error joining test pass", e)
-            }
-        }
-    }
+
+
+
 }
