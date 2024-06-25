@@ -7,11 +7,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import androidx.navigation.NavType
 import com.ssccgl.pinnacle.testportal.testPortal.ui.ExamPostScreen
-import com.ssccgl.pinnacle.testportal.viewmodel.HomeViewModel
-import com.ssccgl.pinnacle.testportal.viewmodel.TestPortalViewModel
-import com.ssccgl.pinnacle.testportal.viewmodel.TestPassViewModel
-import com.ssccgl.pinnacle.testportal.viewmodel.ExamPostViewModel
+import com.ssccgl.pinnacle.testportal.viewmodel.*
 
 @Composable
 fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewModel) {
@@ -19,6 +18,7 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
     val testPassViewModel: TestPassViewModel = viewModel()
     val individualExamTestPassViewModel: IndividualExamTestPassViewModel = viewModel()
     val examPostViewModel: ExamPostViewModel = viewModel()
+    val individualExamPostViewModel: IndividualExamPostViewModel = viewModel()
 
     NavHost(navController, startDestination = "dashboard") {
         composable("home") { HomeScreen(homeViewModel) }
@@ -29,5 +29,12 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
         composable("test_pass") { TestPassScreen(navController, testPassViewModel, individualExamTestPassViewModel) }
         composable("individual_exam_test_pass") { IndividualExamTestPassScreen(individualExamTestPassViewModel, navController) }
         composable("exam_post_screen") { ExamPostScreen(examPostViewModel) }
+        composable(
+            route = "individual_exam_post_screen/{examPostId}",
+            arguments = listOf(navArgument("examPostId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val examPostId = backStackEntry.arguments?.getString("examPostId") ?: ""
+            IndividualExamPostScreen(individualExamPostViewModel, navController, examPostId)
+        }
     }
 }

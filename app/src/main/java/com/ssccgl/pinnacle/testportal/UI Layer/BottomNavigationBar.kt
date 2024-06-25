@@ -18,7 +18,6 @@
 //val icons = listOf(
 //    Icons.Default.Home to "Home",
 //    Icons.Default.Assessment to "Test Portal",
-//   // Icons.Default.Dashboard to "Dashboard",
 //    Icons.Default.ShoppingCart to "Product",
 //    Icons.Default.School to "My Courses"
 //)
@@ -35,10 +34,13 @@
 //                .fillMaxWidth()
 //        ) {
 //            icons.subList(0, 2).forEach { (icon, label) ->
+//                val selected = navController.currentDestination?.route == label.toLowerCase().replace(" ", "_")
 //                BottomNavigationItem(
 //                    icon = { Icon(imageVector = icon, contentDescription = label) },
 //                    label = { Text(label) },
-//                    selected = navController.currentDestination?.route == label.toLowerCase().replace(" ", "_"),
+//                    selected = selected,
+//                    selectedContentColor = MaterialTheme.colors.primary,
+//                    unselectedContentColor = Color.Gray,
 //                    onClick = {
 //                        navController.navigate(label.toLowerCase().replace(" ", "_")) {
 //                            popUpTo(navController.graph.startDestinationId) {
@@ -52,10 +54,13 @@
 //            }
 //            Spacer(Modifier.weight(1f, true))
 //            icons.subList(2, 4).forEach { (icon, label) ->
+//                val selected = navController.currentDestination?.route == label.toLowerCase().replace(" ", "_")
 //                BottomNavigationItem(
 //                    icon = { Icon(imageVector = icon, contentDescription = label) },
 //                    label = { Text(label) },
-//                    selected = navController.currentDestination?.route == label.toLowerCase().replace(" ", "_"),
+//                    selected = selected,
+//                    selectedContentColor = MaterialTheme.colors.primary,
+//                    unselectedContentColor = Color.Gray,
 //                    onClick = {
 //                        navController.navigate(label.toLowerCase().replace(" ", "_")) {
 //                            popUpTo(navController.graph.startDestinationId) {
@@ -132,15 +137,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                     selected = selected,
                     selectedContentColor = MaterialTheme.colors.primary,
                     unselectedContentColor = Color.Gray,
-                    onClick = {
-                        navController.navigate(label.toLowerCase().replace(" ", "_")) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
+                    onClick = { navigateTo(navController, label.toLowerCase().replace(" ", "_")) }
                 )
             }
             Spacer(Modifier.weight(1f, true))
@@ -152,29 +149,13 @@ fun BottomNavigationBar(navController: NavHostController) {
                     selected = selected,
                     selectedContentColor = MaterialTheme.colors.primary,
                     unselectedContentColor = Color.Gray,
-                    onClick = {
-                        navController.navigate(label.toLowerCase().replace(" ", "_")) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
+                    onClick = { navigateTo(navController, label.toLowerCase().replace(" ", "_")) }
                 )
             }
         }
 
         FloatingActionButton(
-            onClick = {
-                navController.navigate("dashboard") {
-                    popUpTo(navController.graph.startDestinationId) {
-                        saveState = true
-                    }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            },
+            onClick = { navigateTo(navController, "dashboard") },
             backgroundColor = MaterialTheme.colors.primary,
             contentColor = Color.White,
             modifier = Modifier
@@ -183,5 +164,16 @@ fun BottomNavigationBar(navController: NavHostController) {
         ) {
             Icon(imageVector = Icons.Default.Dashboard, contentDescription = "Dashboard")
         }
+    }
+}
+
+
+fun navigateTo(navController: NavHostController, route: String) {
+    navController.navigate(route) {
+        popUpTo(navController.graph.startDestinationId) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
     }
 }

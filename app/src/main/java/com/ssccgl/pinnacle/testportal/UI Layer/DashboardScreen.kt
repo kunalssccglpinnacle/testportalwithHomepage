@@ -108,8 +108,8 @@ fun DashboardScreen(navController: NavHostController) {
     )
 
     val onClickHandlers = listOf(
-        { navController.navigate("test_portal") },
-       // {navController.navigate("test_pass")},
+       // { navController.navigate("test_portal") },
+        {navController.navigate("test_pass")},
         { navController.navigate("dashboard") },
         { navController.navigate("product") },
         { navController.navigate("my_courses") },

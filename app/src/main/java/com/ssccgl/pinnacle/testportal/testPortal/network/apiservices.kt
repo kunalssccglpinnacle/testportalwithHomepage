@@ -32,6 +32,11 @@ data class TestPass(
 )
 
 
+data class ExamPost(
+    val post_name: String,
+    val exam_post_tier_id: Int,
+    val logo: String
+)
 
 
 
@@ -39,7 +44,9 @@ data class TestPass(
 
 
 
-data class getExamPost(
+
+
+data class IndividualExamPost(
     val _id: String,
     val id: Int,
     val order_list: Int,
@@ -50,17 +57,6 @@ data class getExamPost(
     val exam_post_id: Int
 )
 
-data class getExamPostRequest(
-    val exam_post_id: String
-)
-
-
-
-data class ExamPost(
-    val post_name: String,
-    val exam_post_tier_id: Int,
-    val logo: String
-)
 
 
 
@@ -79,8 +75,7 @@ interface ApiService {
 
 
     @POST("getindividualexampostdata")
-    suspend fun getExamPostData(@Body request: getExamPostRequest): List<getExamPost>
-
+    suspend fun getIndividualExamPostData(@Body examPostId: Map<String, Int>): List<IndividualExamPost>
 }
 
 object RetrofitInstance {
@@ -94,3 +89,14 @@ object RetrofitInstance {
 }
 
 
+object NetworkService {
+    private const val BASE_URL = "http://3.111.199.93:5000/"
+
+    val api: ApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ApiService::class.java)
+    }
+}

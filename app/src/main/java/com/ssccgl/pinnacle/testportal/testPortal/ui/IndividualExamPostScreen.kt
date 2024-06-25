@@ -1,6 +1,6 @@
+
 package com.ssccgl.pinnacle.testportal.ui
 
-import IndividualExamTestPassViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,32 +17,38 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ssccgl.pinnacle.testportal.network.IndividualExamTestPass
+import com.ssccgl.pinnacle.testportal.network.IndividualExamPost
+import com.ssccgl.pinnacle.testportal.viewmodel.IndividualExamPostViewModel
 
 @Composable
-fun IndividualExamTestPassScreen(viewModel: IndividualExamTestPassViewModel = viewModel(), navController: NavHostController) {
-    val examTestPassesState = viewModel.individualExamTestPasses.collectAsState()
-    val examTestPasses = examTestPassesState.value
+fun IndividualExamPostScreen(viewModel: IndividualExamPostViewModel, navController: NavHostController, examPostId: String) {
+    val individualExamPostsState = viewModel.individualExamPosts.collectAsState()
+    val individualExamPosts = individualExamPostsState.value
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchIndividualExamPostData(examPostId.toInt())
+    }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text(
-            text = "Individual Exam Test Passes",
+            text = "Exam Post Details",
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        if (examTestPasses.isEmpty()) {
-            Text(text = "No test passes available.",
+        if (individualExamPosts.isEmpty()) {
+            Text(
+                text = "No exam post data available.",
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp,
-                modifier = Modifier.padding(bottom = 16.dp))
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
         } else {
             LazyColumn {
-                items(examTestPasses) { examTestPass ->
-                    StyledCard(examTestPass, navController)
+                items(individualExamPosts) { examPost ->
+                    IndividualExamPostCard(examPost, navController)
                 }
             }
         }
@@ -49,7 +56,7 @@ fun IndividualExamTestPassScreen(viewModel: IndividualExamTestPassViewModel = vi
 }
 
 @Composable
-fun StyledCard(examTestPass: IndividualExamTestPass, navController: NavHostController) {
+fun IndividualExamPostCard(examPost: IndividualExamPost, navController: NavHostController) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -63,7 +70,7 @@ fun StyledCard(examTestPass: IndividualExamTestPass, navController: NavHostContr
                 .padding(16.dp)
         ) {
             Text(
-                text = examTestPass.exam_post_name,
+                text = examPost.post_tier_name,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
             )
@@ -79,27 +86,21 @@ fun StyledCard(examTestPass: IndividualExamTestPass, navController: NavHostContr
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
-            ){
-            Button(
-                onClick = {
-                    navController.navigate("individual_exam_post_screen/${examTestPass.id}")
-                },
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1E88E5))
             ) {
-                Text(text = "buy Now")
-            }
-
                 Button(
-                    onClick = {
-                        navController.navigate("individual_exam_post_screen/${examTestPass.id}")
-                    },
+                    onClick = { navController.navigate("exam_post_screen") },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1E88E5))
+                ) {
+                    Text(text = "buy Now")
+                }
+                Button(
+                    onClick = { navController.navigate("exam_post_screen") },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1E88E5))
                 ) {
                     Text(text = "show more")
-                }}
-
-
-                Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = "Use coupon code for extra discount.... Apply code",

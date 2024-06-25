@@ -63,7 +63,9 @@ fun AppDrawer(navController: NavHostController, scaffoldState: ScaffoldState) {
         // Drawer items
         val icons = listOf(
             Icons.Default.Home to "Home",
-            Icons.Default.Assessment to "Test Portal",
+
+            Icons.Default.Assessment to "test_pass",
+           // Icons.Default.Assessment to "Test Portal",
             Icons.Default.Dashboard to "Dashboard",
             Icons.Default.ShoppingCart to "Product",
             Icons.Default.School to "My Courses",
