@@ -3,7 +3,6 @@ package com.ssccgl.pinnacle.testportal.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssccgl.pinnacle.testportal.network.IndividualExamTestPass
 import com.ssccgl.pinnacle.testportal.network.RetrofitInstance
 import com.ssccgl.pinnacle.testportal.network.TestPass
 import kotlinx.coroutines.flow.MutableStateFlow

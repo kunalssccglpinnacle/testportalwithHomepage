@@ -29,9 +29,7 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
         composable("test_pass") { TestPassScreen(navController, testPassViewModel, individualExamTestPassViewModel) }
         composable("individual_exam_test_pass") { IndividualExamTestPassScreen(individualExamTestPassViewModel, navController) }
         composable("exam_post_screen") { ExamPostScreen(examPostViewModel) }
-        composable(
-            route = "individual_exam_post_screen/{examPostId}",
-            arguments = listOf(navArgument("examPostId") { type = NavType.StringType })
+        composable(route = "individual_exam_post_screen/{examPostId}", arguments = listOf(navArgument("examPostId") { type = NavType.StringType })
         ) { backStackEntry ->
             val examPostId = backStackEntry.arguments?.getString("examPostId") ?: ""
             IndividualExamPostScreen(individualExamPostViewModel, navController, examPostId)

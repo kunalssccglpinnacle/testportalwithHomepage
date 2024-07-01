@@ -32,7 +32,7 @@ fun IndividualExamPostScreen(viewModel: IndividualExamPostViewModel, navControll
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text(
-            text = "Exam Post Details",
+            text = "Exam Post Details3",
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -112,3 +112,4 @@ fun IndividualExamPostCard(examPost: IndividualExamPost, navController: NavHostC
         }
     }
 }
+

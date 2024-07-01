@@ -15,10 +15,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.ssccgl.pinnacle.testportal.R
 import com.ssccgl.pinnacle.testportal.network.TestPass
 
@@ -220,3 +222,9 @@ fun TestPassCard(
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun TestPassScreen() {
+    val navController = rememberNavController()
+    TestPassScreen(navController)
+}
