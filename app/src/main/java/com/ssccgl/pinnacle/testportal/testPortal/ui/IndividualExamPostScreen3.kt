@@ -1,7 +1,9 @@
 
 package com.ssccgl.pinnacle.testportal.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,12 +15,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.rememberImagePainter
+import com.ssccgl.pinnacle.testportal.network.ExamPost
 import com.ssccgl.pinnacle.testportal.network.IndividualExamPost
+//import com.ssccgl.pinnacle.testportal.viewmodel.ExamPostViewModel
 import com.ssccgl.pinnacle.testportal.viewmodel.IndividualExamPostViewModel
 
 @Composable
@@ -88,13 +94,13 @@ fun IndividualExamPostCard(examPost: IndividualExamPost, navController: NavHostC
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
-                    onClick = { navController.navigate("exam_post_screen") },
+                    onClick = { navController.navigate("new_tests_web") },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1E88E5))
                 ) {
                     Text(text = "buy Now")
                 }
                 Button(
-                    onClick = { navController.navigate("exam_post_screen") },
+                    onClick = { navController.navigate("new_tests_web") },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1E88E5))
                 ) {
                     Text(text = "show more")

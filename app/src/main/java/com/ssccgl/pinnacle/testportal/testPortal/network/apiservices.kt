@@ -1,5 +1,6 @@
 package com.ssccgl.pinnacle.testportal.network
 
+
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -57,6 +58,26 @@ data class IndividualExamPost(
     val exam_post_id: Int
 )
 
+data class TestType(
+    val test_type: String,
+    val exam_mode_id: Int,
+    val TotalTests: Int,
+    val FreeTests: Int,
+    val TotalTestSeries: Int
+)
+
+data class ExamPostResponse(
+    val ExamPost: String,
+    val ExamPostTier: String,
+    val TestType: List<TestType>
+)
+
+data class ExamPostRequest(
+    val email_id: String,
+    val exam_post_tier_id: String,
+    val exam_id: String,
+    val tier_id: String
+)
 
 
 
@@ -69,13 +90,22 @@ interface ApiService {
     @POST("individualexamtestpass")
     suspend fun getIndividualExamTestPass(@Body request: Map<String, Int>): IndividualExamTestPassResponse
 
-    @Headers("Content-Type: application/json")
-    @POST("RelatedExam")
-    suspend fun fetchExamPosts(@Body request: Map<String, String>): Response<List<ExamPost>>
+
 
 
     @POST("getindividualexampostdata")
     suspend fun getIndividualExamPostData(@Body examPostId: Map<String, Int>): List<IndividualExamPost>
+
+
+
+
+    @POST("NewTestsWeb")
+    suspend fun getExamPostData(@Body request: List<ExamPostRequest>): List<ExamPostResponse>
+
+    @Headers("Content-Type: application/json")
+    @POST("RelatedExam")
+    suspend fun fetchExamPosts(@Body request: Map<String, String>): Response<List<ExamPost>>
+
 }
 
 object RetrofitInstance {
@@ -89,14 +119,13 @@ object RetrofitInstance {
 }
 
 
-object NetworkService {
-    private const val BASE_URL = "http://3.111.199.93:5000/"
-
-    val api: ApiService by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(ApiService::class.java)
-    }
-}
+//object NetworkService {
+//    private const val BASE_URL = "http://3.111.199.93:5000/"
+//
+//    val api: ApiService by lazy {
+//        Retrofit.Builder()
+//            .baseUrl(BASE_URL)
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .build()
+//            .create(ApiService::class.java)
+//    }
