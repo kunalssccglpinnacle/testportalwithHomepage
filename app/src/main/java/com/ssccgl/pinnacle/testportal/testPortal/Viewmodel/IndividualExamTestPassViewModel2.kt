@@ -1,4 +1,6 @@
-// IndividualExamTestPassViewModel.kt
+
+package com.ssccgl.pinnacle.testportal.testPortal.Viewmodel
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssccgl.pinnacle.testportal.network.IndividualExamTestPass
@@ -8,15 +10,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class IndividualExamTestPassViewModel : ViewModel() {
+class IndividualExamTestPassViewModel2 : ViewModel() {
     private val _individualExamTestPasses = MutableStateFlow<List<IndividualExamTestPass>>(emptyList())
     val individualExamTestPasses: StateFlow<List<IndividualExamTestPass>> get() = _individualExamTestPasses.asStateFlow()
 
-    fun fetchIndividualExamTestPasses(examId: Int) {
+    fun fetchIndividualExamTestPasses(productId: Int) {
         viewModelScope.launch {
             try {
-                val response = RetrofitInstance.api.getIndividualExamTestPass(mapOf("exam_id" to examId))
-                _individualExamTestPasses.value = response.examData
+                val response = RetrofitInstance.api.getIndividualExamTestPass(mapOf("product_id" to productId))
+                _individualExamTestPasses.value = response
             } catch (e: Exception) {
                 _individualExamTestPasses.value = emptyList() // or some error state
             }

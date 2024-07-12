@@ -81,6 +81,13 @@ dependencies {
     // Gson converter for Retrofit
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
 
-    implementation ("io.coil-kt:coil-compose:2.4.0")
+    //implementation ("io.coil-kt:coil-compose:2.4.0")
 
+   // implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.6.0")
+    // Retrofit
+    //implementation ("com.squareup.re &#8203;:citation[oaicite:0]{index=0}&#8203")
+
+
+    implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
+    implementation ("io.coil-kt:coil-compose:2.4.0")
 }

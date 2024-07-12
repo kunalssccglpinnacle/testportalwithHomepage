@@ -1,88 +1,6 @@
-//
-//package com.ssccgl.pinnacle.testportal.ui
-//
-//import IndividualExamTestPassViewModel
-//import androidx.compose.runtime.Composable
-//import androidx.lifecycle.viewmodel.compose.viewModel
-//import androidx.navigation.NavHostController
-//import androidx.navigation.compose.NavHost
-//import androidx.navigation.compose.composable
-//import androidx.navigation.navArgument
-//import androidx.navigation.NavType
-////import com.ssccgl.pinnacle.testportal.testPortal.ui.ExamPostScreen
-//import com.ssccgl.pinnacle.testportal.viewmodel.*
-//
-//@Composable
-//fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewModel) {
-//    val testPortalViewModel: TestPortalViewModel = viewModel()
-//    val testPassViewModel: TestPassViewModel = viewModel()
-//    val individualExamTestPassViewModel: IndividualExamTestPassViewModel = viewModel()
-//  //  val examPostViewModel: ExamPostViewModel = viewModel()
-//    val individualExamPostViewModel: IndividualExamPostViewModel = viewModel()
-//
-//    NavHost(navController, startDestination = "dashboard") {
-//        composable("home") { HomeScreen(homeViewModel) }
-//        composable("test_portal") { TestPortalScreen(navController, testPortalViewModel) }
-//        composable("product") { ProductScreen() }
-//        composable("my_courses") { MyCoursesScreen() }
-//        composable("dashboard") { DashboardScreen(navController) }
-//        composable("test_pass") { TestPassScreen(navController, testPassViewModel, individualExamTestPassViewModel) }
-//        composable("individual_exam_test_pass") { IndividualExamTestPassScreen(individualExamTestPassViewModel, navController) }
-//      //  composable("exam_post_screen") { ExamPostScreen(examPostViewModel) }
-//        composable(route = "individual_exam_post_screen/{examPostId}", arguments = listOf(navArgument("examPostId") { type = NavType.StringType })
-//        ) { backStackEntry ->
-//            val examPostId = backStackEntry.arguments?.getString("examPostId") ?: ""
-//            IndividualExamPostScreen(individualExamPostViewModel, navController, examPostId)
-//        }
-//    }
-//}
-
-//
-//// NavigationHost.kt
-//package com.ssccgl.pinnacle.testportal.ui
-//
-//import IndividualExamTestPassViewModel
-//import androidx.compose.runtime.Composable
-//import androidx.lifecycle.viewmodel.compose.viewModel
-//import androidx.navigation.NavHostController
-//import androidx.navigation.compose.NavHost
-//import androidx.navigation.compose.composable
-//import androidx.navigation.navArgument
-//import androidx.navigation.NavType
-//import com.ssccgl.pinnacle.testportal.testPortal.Viewmodel.NewTestsWebViewModel
-//import com.ssccgl.pinnacle.testportal.testPortal.ui.NewTestsWebScreen
-//import com.ssccgl.pinnacle.testportal.viewmodel.*
-//
-//@Composable
-//fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewModel) {
-//    val testPortalViewModel: TestPortalViewModel = viewModel()
-//    val testPassViewModel: TestPassViewModel = viewModel()
-//    val individualExamTestPassViewModel: IndividualExamTestPassViewModel = viewModel()
-//    val individualExamPostViewModel: IndividualExamPostViewModel = viewModel()
-//    val newTestsWebViewModel: NewTestsWebViewModel = viewModel()
-//
-//    NavHost(navController, startDestination = "dashboard") {
-//        composable("home") { HomeScreen(homeViewModel) }
-//        composable("test_portal") { TestPortalScreen(navController, testPortalViewModel) }
-//        composable("product") { ProductScreen() }
-//        composable("my_courses") { MyCoursesScreen() }
-//        composable("dashboard") { DashboardScreen(navController) }
-//        composable("test_pass") { TestPassScreen(navController, testPassViewModel, individualExamTestPassViewModel) }
-//        composable("individual_exam_test_pass") { IndividualExamTestPassScreen(individualExamTestPassViewModel, navController) }
-//        composable(route = "individual_exam_post_screen/{examPostId}", arguments = listOf(navArgument("examPostId") { type = NavType.StringType })
-//        ) { backStackEntry ->
-//            val examPostId = backStackEntry.arguments?.getString("examPostId") ?: ""
-//            IndividualExamPostScreen(individualExamPostViewModel, navController, examPostId)
-//        }
-//        composable("new_tests_web") { NewTestsWebScreen() }
-//    }
-//}
-//
-
 
 package com.ssccgl.pinnacle.testportal.ui
 
-import IndividualExamTestPassViewModel
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -90,22 +8,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
-import com.ssccgl.pinnacle.testportal.testPortal.Viewmodel.NewTestsWebViewModel
-import com.ssccgl.pinnacle.testportal.testPortal.Viewmodel.NewTestsWebViewModelFactory
-import com.ssccgl.pinnacle.testportal.testPortal.ui.NewTestsWebScreen
-import com.ssccgl.pinnacle.testportal.viewmodel.*
+import com.ssccgl.pinnacle.testportal.testPortal.Viewmodel.*
+import com.ssccgl.pinnacle.testportal.viewmodel.HomeViewModel
+import com.ssccgl.pinnacle.testportal.viewmodel.TestPassViewModel
+import com.ssccgl.pinnacle.testportal.viewmodel.TestPortalViewModel
 
 @Composable
 fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewModel) {
     val testPortalViewModel: TestPortalViewModel = viewModel()
     val testPassViewModel: TestPassViewModel = viewModel()
-    val individualExamTestPassViewModel: IndividualExamTestPassViewModel = viewModel()
-    val individualExamPostViewModel: IndividualExamPostViewModel = viewModel()
-
-    // Use the factory to create the NewTestsWebViewModel
-    val newTestsWebViewModel: NewTestsWebViewModel = viewModel(
-        factory = NewTestsWebViewModelFactory(individualExamPostViewModel)
-    )
+    val individualExamTestPassViewModel: IndividualExamTestPassViewModel2 = viewModel()
 
     NavHost(navController, startDestination = "dashboard") {
         composable("home") { HomeScreen(homeViewModel) }
@@ -113,15 +25,14 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
         composable("product") { ProductScreen() }
         composable("my_courses") { MyCoursesScreen() }
         composable("dashboard") { DashboardScreen(navController) }
-        composable("test_pass") { TestPassScreen(navController, testPassViewModel, individualExamTestPassViewModel) }
-        composable("individual_exam_test_pass") { IndividualExamTestPassScreen(individualExamTestPassViewModel, navController) }
-        composable(route = "individual_exam_post_screen/{examPostId}", arguments = listOf(navArgument("examPostId") { type = NavType.StringType })
+        composable("test_pass") { TestPassScreen(navController, testPassViewModel) }
+        composable(
+            route = "individual_exam_test_pass/{productId}",
+            arguments = listOf(navArgument("productId") { type = NavType.IntType })
         ) { backStackEntry ->
-            val examPostId = backStackEntry.arguments?.getString("examPostId") ?: ""
-            IndividualExamPostScreen(individualExamPostViewModel, navController, examPostId)
-        }
-        composable("new_tests_web") {
-            NewTestsWebScreen(newTestsWebViewModel)
+            val productId = backStackEntry.arguments?.getInt("productId") ?: 0
+            IndividualExamTestPassScreen(productId = productId, viewModel = individualExamTestPassViewModel, navController = navController)
         }
     }
 }
+
