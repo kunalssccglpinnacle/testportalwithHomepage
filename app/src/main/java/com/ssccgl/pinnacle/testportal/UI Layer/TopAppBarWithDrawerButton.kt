@@ -1,3 +1,4 @@
+
 package com.ssccgl.pinnacle.testportal.ui
 
 import androidx.compose.material.Icon
@@ -25,7 +26,6 @@ fun TopAppBarWithDrawerButton(scaffoldState: ScaffoldState) {
                 }
             }) {
                 Icon(Icons.Default.Menu, contentDescription = "Menu")
-               // navigationIcon = { Icon(Icons.Default.Menu, contentDescription = "Menu") }
             }
         }
     )

@@ -1,4 +1,3 @@
-
 package com.ssccgl.pinnacle.testportal.ui
 
 import androidx.compose.foundation.background
@@ -7,6 +6,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -33,34 +34,45 @@ fun IndividualExamTestPassScreen(
     val examTestPassesState = viewModel.individualExamTestPasses.collectAsState()
     val examTestPasses = examTestPassesState.value
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Individual Exam Test Pass") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
 
-        TestPassHeader()
-        Text(
-            text = "Individual Exam Test Passes",
-            fontWeight = FontWeight.Bold,
-            fontSize = 24.sp,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        if (examTestPasses.isEmpty()) {
+            TestPassHeader()
             Text(
-                text = "No test passes available.",
+                text = "Individual Exam Test Passes",
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-        } else {
-            LazyColumn {
-                items(examTestPasses) { examTestPass ->
-                    StyledCard(examTestPass, navController)
+
+            if (examTestPasses.isEmpty()) {
+                Text(
+                    text = "No test passes available.",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+            } else {
+                LazyColumn {
+                    items(examTestPasses) { examTestPass ->
+                        StyledCard(examTestPass, navController)
+                    }
                 }
             }
         }
     }
 }
-
-
 
 @Composable
 fun StyledCard(examTestPass: IndividualExamTestPass, navController: NavHostController) {
@@ -108,10 +120,10 @@ fun FeatureList(examTestPass: IndividualExamTestPass) {
         modifier = Modifier.fillMaxWidth()
     ) {
         val features = listOf(
-            "Mock Test Count: ${examTestPass.mockTestCount}",
-            "Sectional Test Count: ${examTestPass.sectionalTestCount}",
-            "Chapterwise Test Count: ${examTestPass.chapterwiseTestCount}",
-            "Previous Year Test Count: ${examTestPass.previousYearTestCount}"
+            "Mock Test : ${examTestPass.mockTestCount}",
+            "Sectional Test : ${examTestPass.sectionalTestCount}",
+            "Chapterwise Test  ${examTestPass.chapterwiseTestCount}",
+            "Previous Year Test : ${examTestPass.previousYearTestCount}"
         )
         features.forEach { feature ->
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -142,20 +154,25 @@ fun ActionButtons(navController: NavHostController, examTestPass: IndividualExam
     ) {
         Button(
             onClick = {
-//                navController.navigate("individual_exam_post_screen/${examTestPass.exam_post_id}")
+                navController.navigate(
+                    "new_tests_web_screen/" +
+                            "${examTestPass.exam_post_id}/" +
+                            "${examTestPass.exam_id}/" +
+                            "${examTestPass.id}"
+                )
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF90CAF9))
         ) {
-            Text(text = "show more")
+            Text(text = "Show more")
         }
 
         Button(
             onClick = {
-//                navController.navigate("individual_exam_post_screen/${examTestPass.exam_post_id}")
+                // Handle the buy now action
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray)
         ) {
-            Text(text = "buy now")
+            Text(text = "Buy now")
         }
     }
 }

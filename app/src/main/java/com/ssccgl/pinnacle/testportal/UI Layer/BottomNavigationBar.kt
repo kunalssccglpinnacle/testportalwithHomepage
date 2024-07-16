@@ -71,7 +71,6 @@ fun BottomNavigationBar(navController: NavHostController) {
     }
 }
 
-
 fun navigateTo(navController: NavHostController, route: String) {
     navController.navigate(route) {
         popUpTo(navController.graph.startDestinationId) {
