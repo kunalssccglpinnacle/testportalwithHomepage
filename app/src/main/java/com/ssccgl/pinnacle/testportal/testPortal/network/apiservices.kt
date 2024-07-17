@@ -122,7 +122,7 @@ data class TestSeriesDetails2Response(
         val answer: String
     )
 
-    data class ApiResponse(
+    data class ApiResponse( // index api responce
         val subjects: List<Subject>,
         val details: List<Detail>
     )
