@@ -118,7 +118,7 @@ fun TestDetailsCard(test: TestSeriesDetails2Response.AR, navController: NavContr
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_marks),
+                    painter = painterResource(id = R.drawable.img),
                     contentDescription = null,
                     modifier = Modifier.size(16.dp)
                 )
