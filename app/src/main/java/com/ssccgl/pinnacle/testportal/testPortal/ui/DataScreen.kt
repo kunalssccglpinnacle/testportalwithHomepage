@@ -41,6 +41,7 @@ fun DataScreen(
     val selectedOption by viewModel.selectedOption.observeAsState("")
     val isDataDisplayed by viewModel.isDataDisplayed.observeAsState(false)
 
+//    val selectedOptions = viewModel.selectedOptions
     val elapsedTimeMap = viewModel.elapsedTimeMap
 
     val remainingCountdown by viewModel.remainingCountdown.observeAsState(3600L)
@@ -48,8 +49,8 @@ fun DataScreen(
 
     val startTimeMap = viewModel.startTimeMap
     val elapsedTime by viewModel.elapsedTime.observeAsState(0L)
-    val displayElapsedTime by viewModel.displayElapsedTime.observeAsState("00:00:00") // Renamed
-    val displayCountdownTime by viewModel.displayCountdownTime.observeAsState("00:00:00") // New
+    val displayElapsedTime by viewModel.displayElapsedTime.observeAsState("00:00:00")
+    val displayCountdownTime by viewModel.displayCountdownTime.observeAsState("00:00:00")
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
@@ -91,7 +92,6 @@ fun DataScreen(
         }
     }
 
-
     ModalNavigationDrawer(
         drawerState = drawerState,
         scrimColor = Color.Black.copy(alpha = 0.5f),
@@ -124,8 +124,8 @@ fun DataScreen(
                                         subject = detail.subject_id,
                                         currentPaperId = detail.qid,
                                         remainingTime = formatTime(remainingCountdown),
-                                        singleTm = formatTime(newElapsedTime), // Save time in seconds
-                                        saveType = "nav", // Pass "nav" as SaveType
+                                        singleTm = formatTime(newElapsedTime),
+                                        saveType = "nav",
                                         answerStatus = "4"
                                     )
 
@@ -160,7 +160,7 @@ fun DataScreen(
                         .fillMaxSize()
                         .padding(paddingValues)
                 ) {
-                    val tabTitles = listOf("Reasoning", "General Awareness", "Quantitative Aptitude", "English")
+                    val tabTitles = data.flatMap { it.subjects }.map { it.subject_name }
                     val selectedTabIndex by viewModel.selectedTabIndex.observeAsState(0)
 
                     TabRow(selectedTabIndex = selectedTabIndex) {
@@ -266,9 +266,9 @@ fun DataScreen(
                                                             paperId = currentQuestion.qid,
                                                             option = viewModel.validateOption(selectedOption),
                                                             subject = currentQuestion.subject_id,
-                                                            currentPaperId = previousQuestionId, // Set CurrentPaperId to the previous question number
+                                                            currentPaperId = previousQuestionId,
                                                             remainingTime = formatTime(remainingCountdown),
-                                                            singleTm = formatTime(newElapsedTime), // Save time in seconds
+                                                            singleTm = formatTime(newElapsedTime),
                                                             saveType = "nxt",
                                                             answerStatus = "1"
                                                         )
@@ -297,7 +297,7 @@ fun DataScreen(
                                                             subject = currentQuestion.subject_id,
                                                             currentPaperId = nextQuestionId,
                                                             remainingTime = formatTime(remainingCountdown),
-                                                            singleTm = formatTime(newElapsedTime),  // Save time in seconds
+                                                            singleTm = formatTime(newElapsedTime),
                                                             saveType = "nxt",
                                                             answerStatus = "1"
                                                         )
