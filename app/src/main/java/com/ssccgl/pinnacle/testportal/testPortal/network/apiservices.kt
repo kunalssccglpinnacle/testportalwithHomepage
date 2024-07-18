@@ -187,6 +187,24 @@ data class SubmitResponse(
         val status: String
     )
 
+data class PaperCodeDetailsResponse(
+    val paper_code: String,
+    val title: String,
+    val subject_id: Int,
+    val questions: Int,
+    val hrs: Int,
+    val mins: Int,
+    val secs: Int,
+    val subject_name: String,
+    val answered_count: Int,
+    val notanswered_count: Int,
+    val marked_count: Int,
+    val marked_answered_count: Int,
+    val not_visited: Int,
+    val test_type: String
+)
+
+
 
 
 
@@ -225,6 +243,10 @@ interface ApiService {
 
     @POST("/submit")
     suspend fun submit(@Body request: SubmitRequest): SubmitResponse
+
+    @POST("/paperCodeDetails")
+    suspend fun fetchPaperCodeDetails(@Body request: FetchDataRequest): PaperCodeDetailsResponse
+
 
 //    @POST("get_new_tests_web_endpoint") // Update with your actual endpoint
 //    suspend fun getNewTestsWeb(@Body request: List<NewTestsWebRequest>): List<NewTestsWebResponse>
