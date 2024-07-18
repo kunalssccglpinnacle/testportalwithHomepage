@@ -165,7 +165,7 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
             val examId = backStackEntry.arguments?.getInt("examId") ?: 0
             val tierId = backStackEntry.arguments?.getInt("tierId") ?: 0
             NewTestsWebScreen(
-                emailId = "harishmodi@129@gmail.com", // replace with actual email if needed
+                emailId = "anshulji100@gmail.com", // replace with actual email if needed
                 examPostId = examPostId.toString(),
                 examId = examId.toString(),
                 tierId = tierId.toString(),
