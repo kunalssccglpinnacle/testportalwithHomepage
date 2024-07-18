@@ -20,6 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.ssccgl.pinnacle.testportal.R
+import com.ssccgl.pinnacle.testportal.network.AR
 import com.ssccgl.pinnacle.testportal.network.RetrofitInstance
 import com.ssccgl.pinnacle.testportal.network.TestSeriesDetails2Response
 import com.ssccgl.pinnacle.testportal.repository.TestRepository
@@ -171,7 +172,7 @@ fun TestSeriesDetails2Screen(
 //}
 
 @Composable
-fun TestDetailsCard(test: TestSeriesDetails2Response.AR, navController: NavController) {
+fun TestDetailsCard(test: AR, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

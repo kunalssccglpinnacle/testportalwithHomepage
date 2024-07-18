@@ -75,8 +75,9 @@ data class TestSeriesDetails2Request(
 data class TestSeriesDetails2Response(
     val test_series_name: String,
     val ar: List<AR>
-) {
-    data class AR(
+)
+
+data class AR(
         val test_series_id: String,
         val paper_code: String,
         val exam_mode_id: Int,
@@ -97,13 +98,15 @@ data class TestSeriesDetails2Response(
 
 
     // Data classes for index
-    data class Subject(
+
+data class Subject(
         val sb_id: Int,
         val ppr_id: Int,
         val subject_name: String
     )
 
-    data class Detail(
+
+data class Detail(
         val qid: Int,
         val question_id: Int,
         val subject_id: Int,
@@ -122,14 +125,16 @@ data class TestSeriesDetails2Response(
         val answer: String
     )
 
-    data class ApiResponse( // index api responce
+
+data class ApiResponse(
         val subjects: List<Subject>,
         val details: List<Detail>
     )
 
 // data classes for save_next
 
-    data class SaveAnswerRequest(
+
+data class SaveAnswerRequest(
         val paper_code: String,
         val paper_id: String,
         val option: String,
@@ -144,7 +149,8 @@ data class TestSeriesDetails2Response(
         val SaveType: String
     )
 
-    data class SaveAnswerResponse(
+
+data class SaveAnswerResponse(
         val sub_id: Int,
         val answer_status: Int,
         val answer_status_new: Int,
@@ -159,16 +165,18 @@ data class TestSeriesDetails2Response(
         val choosed_answer: String
     )
 
-    // This peice has to be modified in the future as it is the request for the index
-    data class FetchDataRequest(
+
+// This peice has to be modified in the future as it is the request for the index
+data class FetchDataRequest(
         val paper_code: String,
         val email_id: String,
         val exam_mode_id: String,
         val test_series_id: String
     )
 
-    // Data classes for submit request and response
-    data class SubmitRequest(
+
+// Data classes for submit request and response
+data class SubmitRequest(
         val email_id: String,
         val paper_code: String,
         val exam_mode_id: String,
@@ -176,7 +184,8 @@ data class TestSeriesDetails2Response(
         val rTem: String
     )
 
-    data class SubmitResponse(
+
+data class SubmitResponse(
         val status: String
     )
 
@@ -186,7 +195,7 @@ data class TestSeriesDetails2Response(
 
 
 
-}
+
 
 
 interface ApiService {
@@ -211,13 +220,13 @@ interface ApiService {
 
 
     @POST("/index")
-    suspend fun fetchData(@Body request: TestSeriesDetails2Response.FetchDataRequest): List<TestSeriesDetails2Response.ApiResponse>
+    suspend fun fetchData(@Body request: FetchDataRequest): List<ApiResponse>
 
     @POST("/save_next")
-    suspend fun saveAnswer(@Body request: TestSeriesDetails2Response.SaveAnswerRequest): TestSeriesDetails2Response.SaveAnswerResponse
+    suspend fun saveAnswer(@Body request: SaveAnswerRequest): SaveAnswerResponse
 
     @POST("/submit")
-    suspend fun submit(@Body request: TestSeriesDetails2Response.SubmitRequest): TestSeriesDetails2Response.SubmitResponse
+    suspend fun submit(@Body request: SubmitRequest): SubmitResponse
 
 //    @POST("get_new_tests_web_endpoint") // Update with your actual endpoint
 //    suspend fun getNewTestsWeb(@Body request: List<NewTestsWebRequest>): List<NewTestsWebResponse>
