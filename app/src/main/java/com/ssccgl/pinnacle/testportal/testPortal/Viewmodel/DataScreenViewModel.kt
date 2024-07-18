@@ -229,6 +229,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.asLiveData
 import com.ssccgl.pinnacle.testportal.network.IndexResponse
 import com.ssccgl.pinnacle.testportal.network.FetchDataRequest
+import com.ssccgl.pinnacle.testportal.network.PaperCodeDetailsResponse
 import com.ssccgl.pinnacle.testportal.network.RetrofitInstance
 import com.ssccgl.pinnacle.testportal.network.SaveAnswerRequest
 import com.ssccgl.pinnacle.testportal.network.SaveAnswerResponse
@@ -285,6 +286,14 @@ class MainViewModel(
     private val _selectedTabIndex = MutableStateFlow(0)
     val selectedTabIndex: LiveData<Int> = _selectedTabIndex.asLiveData()
 
+    // Adds Title in DataScreen
+    private val _title = MutableStateFlow("")
+    val title: LiveData<String> = _title.asLiveData()
+
+    // Adds values of answered, not answered etc.
+    private val _paperCodeDetails = MutableStateFlow<PaperCodeDetailsResponse?>(null)
+    val paperCodeDetails: LiveData<PaperCodeDetailsResponse?> = _paperCodeDetails.asLiveData()
+
     val selectedOptions = mutableMapOf<Int, String>()
     val elapsedTimeMap = mutableMapOf<Int, Long>()
     val startTimeMap = mutableMapOf<Int, Long>()
@@ -338,6 +347,8 @@ class MainViewModel(
                 val totalSeconds = response.hrs * 3600 + response.mins * 60 + response.secs
                 _remainingCountdown.value = totalSeconds.toLong()
                 _displayCountdownTime.value = formatTime(totalSeconds.toLong())
+                _title.value = response.title // Update the title
+                _paperCodeDetails.value = response // Update the values of answered, not answered etc.
             } catch (e: Exception) {
                 _error.value = e.message
             }
