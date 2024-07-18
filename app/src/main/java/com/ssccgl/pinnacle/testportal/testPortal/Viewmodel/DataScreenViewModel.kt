@@ -21,8 +21,8 @@
 //    private val repository: TestRepository
 //) : ViewModel() {
 //
-//    private val _data = MutableStateFlow<List<TestSeriesDetails2Response.ApiResponse>>(emptyList())
-//    val data: LiveData<List<TestSeriesDetails2Response.ApiResponse>> = _data.asLiveData()
+//    private val _data = MutableStateFlow<List<TestSeriesDetails2Response.IndexResponse>>(emptyList())
+//    val data: LiveData<List<TestSeriesDetails2Response.IndexResponse>> = _data.asLiveData()
 //
 //    private val _error = MutableStateFlow<String?>(null)
 //    val error: LiveData<String?> = _error.asLiveData()
@@ -227,7 +227,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.asLiveData
-import com.ssccgl.pinnacle.testportal.network.ApiResponse
+import com.ssccgl.pinnacle.testportal.network.IndexResponse
 import com.ssccgl.pinnacle.testportal.network.FetchDataRequest
 import com.ssccgl.pinnacle.testportal.network.RetrofitInstance
 import com.ssccgl.pinnacle.testportal.network.SaveAnswerRequest
@@ -249,8 +249,8 @@ class MainViewModel(
 //    private val repository: TestRepository
 ) : ViewModel() {
 
-    private val _data = MutableStateFlow<List<ApiResponse>>(emptyList())
-    val data: LiveData<List<ApiResponse>> = _data.asLiveData()
+    private val _data = MutableStateFlow<List<IndexResponse>>(emptyList())
+    val data: LiveData<List<IndexResponse>> = _data.asLiveData()
 
     private val _error = MutableStateFlow<String?>(null)
     val error: LiveData<String?> = _error.asLiveData()

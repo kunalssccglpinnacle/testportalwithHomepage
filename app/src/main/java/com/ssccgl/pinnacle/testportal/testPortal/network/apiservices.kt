@@ -1,13 +1,11 @@
 
 package com.ssccgl.pinnacle.testportal.network
 
-import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
-import java.util.concurrent.TimeUnit
 
 data class TestPass(
     val Product_title: String,
@@ -126,7 +124,7 @@ data class Detail(
     )
 
 
-data class ApiResponse(
+data class IndexResponse(
         val subjects: List<Subject>,
         val details: List<Detail>
     )
@@ -220,7 +218,7 @@ interface ApiService {
 
 
     @POST("/index")
-    suspend fun fetchData(@Body request: FetchDataRequest): List<ApiResponse>
+    suspend fun fetchData(@Body request: FetchDataRequest): List<IndexResponse>
 
     @POST("/save_next")
     suspend fun saveAnswer(@Body request: SaveAnswerRequest): SaveAnswerResponse

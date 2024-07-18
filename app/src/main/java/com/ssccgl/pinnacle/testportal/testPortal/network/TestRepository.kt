@@ -4,7 +4,7 @@ import com.ssccgl.pinnacle.testportal.network.*
 
 class TestRepository(private val apiService: ApiService) {
 
-//    suspend fun fetchData(request: TestSeriesDetails2Response.FetchDataRequest): List<TestSeriesDetails2Response.ApiResponse>? {
+//    suspend fun fetchData(request: TestSeriesDetails2Response.FetchDataRequest): List<TestSeriesDetails2Response.IndexResponse>? {
 //        return apiService.fetchData(request)
 //    }
 //
