@@ -419,7 +419,7 @@ fun DataScreen(
 
     LaunchedEffect(Pair(isDataDisplayed, currentQuestionId)) {
         if (isDataDisplayed) {
-            val currentQuestion = details.find { it.question_id == currentQuestionId }
+            val currentQuestion = details.find { it.qid == currentQuestionId }
             if (currentQuestion != null) {
                 viewModel.saveCurrentQuestionState(currentQuestionId, selectedOption, elapsedTime)
                 viewModel.initializeElapsedTime(currentQuestionId)
@@ -446,7 +446,7 @@ fun DataScreen(
     LaunchedEffect(isDataDisplayed) {
         if (isDataDisplayed) {
             if (currentQuestionId == 1 && details.isNotEmpty()) {
-                viewModel.moveToQuestion(details.first().question_id)
+                viewModel.moveToQuestion(details.first().qid)
             }
             if (!countdownStarted) {
                 viewModel.startCountdown()
@@ -485,17 +485,17 @@ fun DataScreen(
                                         paperId = currentQuestionId,
                                         option = viewModel.validateOption(selectedOption),
                                         subject = detail.subject_id,
-                                        currentPaperId = detail.question_id,
+                                        currentPaperId = detail.qid,
                                         remainingTime = formatTime(remainingCountdown),
                                         singleTm = formatTime(newElapsedTime), // Save time in seconds
                                         saveType = "nav", // Pass "nav" as SaveType
                                         answerStatus = "4"
                                     )
 
-                                    viewModel.moveToQuestion(detail.question_id)
+                                    viewModel.moveToQuestion(detail.qid)
                                     coroutineScope.launch { drawerState.close() }
                                 },
-                                text = detail.question_id.toString()
+                                text = detail.qid.toString()
                             )
                         }
                     }
@@ -565,7 +565,7 @@ fun DataScreen(
                             modifier = Modifier.padding(16.dp)
                         )
                     } else {
-                        val currentQuestion = details.find { it.question_id == currentQuestionId }
+                        val currentQuestion = details.find { it.qid == currentQuestionId }
 
                         if (currentQuestion != null) {
                             viewModel.setIsDataDisplayed(true)
@@ -626,7 +626,7 @@ fun DataScreen(
                                                         val previousQuestionId = currentQuestionId - 1
 
                                                         viewModel.saveAnswer(
-                                                            paperId = currentQuestion.question_id,
+                                                            paperId = currentQuestion.qid,
                                                             option = viewModel.validateOption(selectedOption),
                                                             subject = currentQuestion.subject_id,
                                                             currentPaperId = previousQuestionId, // Set CurrentPaperId to the previous question number
@@ -643,7 +643,7 @@ fun DataScreen(
                                                 }
                                             }
 
-                                            if (currentQuestionId < details.maxOf { it.question_id }) {
+                                            if (currentQuestionId < details.maxOf { it.qid }) {
                                                 Button(
                                                     onClick = {
                                                         val currentTime = System.currentTimeMillis()
@@ -655,7 +655,7 @@ fun DataScreen(
                                                         val nextQuestionId = currentQuestionId + 1
 
                                                         viewModel.saveAnswer(
-                                                            paperId = currentQuestion.question_id,
+                                                            paperId = currentQuestion.qid,
                                                             option = viewModel.validateOption(selectedOption),
                                                             subject = currentQuestion.subject_id,
                                                             currentPaperId = nextQuestionId,

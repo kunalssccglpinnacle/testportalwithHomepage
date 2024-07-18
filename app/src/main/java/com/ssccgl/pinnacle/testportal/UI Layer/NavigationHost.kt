@@ -219,7 +219,7 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
                 "anshulji100@gmail.com",
                 examModeId.toString(),
                 testSeriesId,
-                TestRepository(RetrofitInstance.api)
+//                TestRepository(RetrofitInstance.api)
             )
             DataScreen(
                 testSeriesId = testSeriesId,

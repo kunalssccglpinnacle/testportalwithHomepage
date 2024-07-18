@@ -219,6 +219,7 @@
 //}
 
 //package com.ssccgl.pinnacle.testcheck_2
+
 package com.ssccgl.pinnacle.testportal.viewmodel
 
 import android.util.Log
@@ -226,9 +227,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.asLiveData
+import com.ssccgl.pinnacle.testportal.network.ApiResponse
+import com.ssccgl.pinnacle.testportal.network.FetchDataRequest
 import com.ssccgl.pinnacle.testportal.network.RetrofitInstance
-import com.ssccgl.pinnacle.testportal.network.TestSeriesDetails2Response
-import com.ssccgl.pinnacle.testportal.repository.TestRepository
+import com.ssccgl.pinnacle.testportal.network.SaveAnswerRequest
+import com.ssccgl.pinnacle.testportal.network.SaveAnswerResponse
+import com.ssccgl.pinnacle.testportal.network.SubmitRequest
 import com.ssccgl.pinnacle.testportal.ui.formatTime
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -242,17 +246,17 @@ class MainViewModel(
     private val emailId: String,
     private val examModeId: String,
     private val testSeriesId: String,
-    private val repository: TestRepository
+//    private val repository: TestRepository
 ) : ViewModel() {
 
-    private val _data = MutableStateFlow<List<TestSeriesDetails2Response.ApiResponse>>(emptyList())
-    val data: LiveData<List<TestSeriesDetails2Response.ApiResponse>> = _data.asLiveData()
+    private val _data = MutableStateFlow<List<ApiResponse>>(emptyList())
+    val data: LiveData<List<ApiResponse>> = _data.asLiveData()
 
     private val _error = MutableStateFlow<String?>(null)
     val error: LiveData<String?> = _error.asLiveData()
 
-    private val _saveAnswerResponse = MutableStateFlow<TestSeriesDetails2Response.SaveAnswerResponse?>(null)
-    val saveAnswerResponse: LiveData<TestSeriesDetails2Response.SaveAnswerResponse?> = _saveAnswerResponse.asLiveData()
+    private val _saveAnswerResponse = MutableStateFlow<SaveAnswerResponse?>(null)
+    val saveAnswerResponse: LiveData<SaveAnswerResponse?> = _saveAnswerResponse.asLiveData()
 
     private val _currentQuestionId = MutableStateFlow(1)
     val currentQuestionId: LiveData<Int> = _currentQuestionId.asLiveData()
@@ -293,7 +297,7 @@ class MainViewModel(
         viewModelScope.launch {
             try {
                 val response = RetrofitInstance.api.fetchData(
-                    TestSeriesDetails2Response.FetchDataRequest(
+                    FetchDataRequest(
                         paper_code = paperCode,
                         email_id = emailId,
                         exam_mode_id = examModeId,
@@ -303,13 +307,13 @@ class MainViewModel(
                 _data.value = response
                 // Set initial answers
                 response.flatMap { it.details }.forEach { detail ->
-                    selectedOptions[detail.question_id] =
+                    selectedOptions[detail.qid] =
                         detail.answer.takeIf { it.isNotBlank() } ?: ""
                 }
                 // Ensure the first question ID is set correctly
                 if (response.isNotEmpty() && response[0].details.isNotEmpty()) {
-                    _currentQuestionId.value = response[0].details[0].question_id
-                    setSelectedOption(response[0].details[0].question_id)
+                    _currentQuestionId.value = response[0].details[0].qid
+                    setSelectedOption(response[0].details[0].qid)
                 }
                 _error.value = null
             } catch (e: Exception) {
@@ -336,7 +340,7 @@ class MainViewModel(
         val currentTime = System.currentTimeMillis()
         val startTime = startTimeMap[questionId] ?: currentTime
         _elapsedTime.value = (elapsedTimeMap[questionId] ?: 0L) + (currentTime - startTime) / 1000
-        _displayElapsedTime.value = formatTime(_elapsedTime.value) // Renamed
+        _displayElapsedTime.value = formatTime(_elapsedTime.value)
     }
 
     fun startCountdown() {
@@ -345,7 +349,7 @@ class MainViewModel(
             while (_remainingCountdown.value > 0) {
                 delay(1000L)
                 _remainingCountdown.value--
-                _displayCountdownTime.value = formatTime(_remainingCountdown.value) // New
+                _displayCountdownTime.value = formatTime(_remainingCountdown.value)
             }
         }
     }
@@ -359,13 +363,8 @@ class MainViewModel(
 
     fun moveToSection(index: Int) {
         _selectedTabIndex.value = index
-        val newQuestionId = when (index) {
-            0 -> 1
-            1 -> 26
-            2 -> 51
-            3 -> 76
-            else -> 1
-        }
+        val selectedSubject = _data.value.flatMap { it.subjects }[index]
+        val newQuestionId = _data.value.flatMap { it.details }.find { it.subject_id == selectedSubject.sb_id && it.qid == selectedSubject.ppr_id }?.qid ?: 1
         moveToQuestion(newQuestionId)
     }
 
@@ -408,7 +407,7 @@ class MainViewModel(
         viewModelScope.launch {
             try {
                 val response = RetrofitInstance.api.saveAnswer(
-                    TestSeriesDetails2Response.SaveAnswerRequest(
+                    SaveAnswerRequest(
                         paper_code = paperCode,
                         paper_id = paperId.toString(),
                         option = validatedOption,
@@ -422,7 +421,6 @@ class MainViewModel(
                         rTem = remainingTime,
                         SingleTm = singleTm
                     )
-
                 )
                 _saveAnswerResponse.value = response
                 _error.value = null
@@ -446,7 +444,7 @@ class MainViewModel(
         viewModelScope.launch {
             try {
                 val response = RetrofitInstance.api.submit(
-                    TestSeriesDetails2Response.SubmitRequest(
+                    SubmitRequest(
                         email_id = emailId,
                         paper_code = paperCode,
                         exam_mode_id = examModeId,
