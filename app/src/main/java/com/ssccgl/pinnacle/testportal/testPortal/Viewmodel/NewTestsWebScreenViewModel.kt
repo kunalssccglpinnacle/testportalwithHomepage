@@ -83,7 +83,6 @@
 //        }
 //    }
 //}
-
 package com.ssccgl.pinnacle.testportal.testPortal.Viewmodel
 
 import android.util.Log
@@ -127,9 +126,9 @@ class NewTestsWebViewModel : ViewModel() {
                 val request = listOf(
                     NewTestsWebRequest(
                         email_id = emailId,
-                        exam_post_tier_id = examPostId,
-                        exam_id = examId,
-                        tier_id = tierId
+                        exam_post_tier_id = if (examPostId.isNotBlank()) examPostId else "1",
+                        exam_id = if (examId.isNotBlank()) examId else "1",
+                        tier_id = if (tierId.isNotBlank()) tierId else "1"
                     )
                 )
                 Log.d("NewTestsWebViewModel", "Fetching data with request: $request")

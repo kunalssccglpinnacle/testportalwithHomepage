@@ -12,12 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import com.ssccgl.pinnacle.testportal.R
-import com.ssccgl.pinnacle.testportal.network.NewTestsWebResponse
-import com.ssccgl.pinnacle.testportal.network.TestType
-import com.ssccgl.pinnacle.testportal.testPortal.Viewmodel.NewTestsWebViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -25,6 +19,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import com.google.gson.Gson
+import com.ssccgl.pinnacle.testportal.R
+import com.ssccgl.pinnacle.testportal.network.NewTestsWebResponse
+import com.ssccgl.pinnacle.testportal.network.TestType
+import com.ssccgl.pinnacle.testportal.testPortal.Viewmodel.NewTestsWebViewModel
+
 
 @Composable
 fun NewTestsWebScreen(
@@ -35,10 +37,8 @@ fun NewTestsWebScreen(
     viewModel: NewTestsWebViewModel = viewModel(),
     navController: NavHostController
 ) {
-    // Fetch the data
     viewModel.fetchNewTestsWebData(emailId, examPostId, examId, tierId)
 
-    // Collect the state
     val newTestsWebState by viewModel.newTestsWebData.collectAsState()
     val totalTestsState by viewModel.totalTests.collectAsState()
     val chapterTestsState by viewModel.chapterTests.collectAsState()
@@ -57,9 +57,10 @@ fun NewTestsWebScreen(
             )
         }
     ) { paddingValues ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
             if (newTestsWebState.isNotEmpty()) {
                 DetailSection(
@@ -75,7 +76,8 @@ fun NewTestsWebScreen(
                     emailId = emailId,
                     examPostId = examPostId,
                     examId = examId,
-                    tierId = tierId
+                    tierId = tierId,
+                    newTestsWebResponse = newTestsWebState
                 )
             } else {
                 Text(
@@ -144,7 +146,8 @@ fun ReleasePlanSection(
     emailId: String,
     examPostId: String,
     examId: String,
-    tierId: String
+    tierId: String,
+    newTestsWebResponse: List<NewTestsWebResponse>
 ) {
     Column(
         modifier = Modifier
@@ -165,7 +168,8 @@ fun ReleasePlanSection(
                     emailId = emailId,
                     examPostId = examPostId,
                     examId = examId,
-                    tierId = tierId
+                    tierId = tierId,
+                    newTestsWebResponse = newTestsWebResponse
                 )
             }
         }
@@ -179,32 +183,33 @@ fun ReleasePlanItem(
     emailId: String,
     examPostId: String,
     examId: String,
-    tierId: String
+    tierId: String,
+    newTestsWebResponse: List<NewTestsWebResponse>
 ) {
+    val gson = Gson()
+    val newTestsWebResponseJson = gson.toJson(newTestsWebResponse)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        elevation = 2.dp,
-        backgroundColor = Color(0xFFF3F4FF) // Background color as per the screenshot
+        elevation = 4.dp
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
             Text(
                 text = testType.test_type,
                 fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = Color(0xFF1C1C1C) // Dark text color
+                fontSize = 18.sp,
+                color = Color(0xFF6200EA)
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "${testType.TotalTests} Total Tests | ${testType.FreeTests} Free Test",
+                text = "${testType.TotalTests} Tests",
                 fontWeight = FontWeight.Normal,
                 fontSize = 14.sp,
-                color = Color(0xFF1C1C1C) // Dark text color
+                color = Color(0xFF1C1C1C)
             )
             Spacer(modifier = Modifier.height(4.dp))
             Row(
@@ -215,19 +220,19 @@ fun ReleasePlanItem(
                     text = "Total Test Series",
                     fontWeight = FontWeight.Normal,
                     fontSize = 14.sp,
-                    color = Color(0xFF1C1C1C) // Dark text color
+                    color = Color(0xFF1C1C1C)
                 )
                 Text(
                     text = "${testType.TotalTestSeries}",
                     fontWeight = FontWeight.Normal,
                     fontSize = 14.sp,
-                    color = Color(0xFF1C1C1C) // Dark text color
+                    color = Color(0xFF1C1C1C)
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
-                    navController.navigate("test_series_screen/$emailId/$examPostId/${testType.exam_mode_id}")
+                    navController.navigate("test_series_screen/$emailId/$tierId/${testType.exam_mode_id}/$newTestsWebResponseJson")
                 },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFA000)),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
