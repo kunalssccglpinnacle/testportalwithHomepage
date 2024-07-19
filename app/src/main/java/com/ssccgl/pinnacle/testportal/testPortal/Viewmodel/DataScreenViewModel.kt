@@ -21,8 +21,8 @@
 //    private val repository: TestRepository
 //) : ViewModel() {
 //
-//    private val _data = MutableStateFlow<List<TestSeriesDetails2Response.ApiResponse>>(emptyList())
-//    val data: LiveData<List<TestSeriesDetails2Response.ApiResponse>> = _data.asLiveData()
+//    private val _data = MutableStateFlow<List<TestSeriesDetails2Response.IndexResponse>>(emptyList())
+//    val data: LiveData<List<TestSeriesDetails2Response.IndexResponse>> = _data.asLiveData()
 //
 //    private val _error = MutableStateFlow<String?>(null)
 //    val error: LiveData<String?> = _error.asLiveData()
@@ -227,8 +227,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.asLiveData
-import com.ssccgl.pinnacle.testportal.network.ApiResponse
+import com.ssccgl.pinnacle.testportal.network.IndexResponse
 import com.ssccgl.pinnacle.testportal.network.FetchDataRequest
+import com.ssccgl.pinnacle.testportal.network.PaperCodeDetailsResponse
 import com.ssccgl.pinnacle.testportal.network.RetrofitInstance
 import com.ssccgl.pinnacle.testportal.network.SaveAnswerRequest
 import com.ssccgl.pinnacle.testportal.network.SaveAnswerResponse
@@ -249,8 +250,8 @@ class MainViewModel(
 //    private val repository: TestRepository
 ) : ViewModel() {
 
-    private val _data = MutableStateFlow<List<ApiResponse>>(emptyList())
-    val data: LiveData<List<ApiResponse>> = _data.asLiveData()
+    private val _data = MutableStateFlow<List<IndexResponse>>(emptyList())
+    val data: LiveData<List<IndexResponse>> = _data.asLiveData()
 
     private val _error = MutableStateFlow<String?>(null)
     val error: LiveData<String?> = _error.asLiveData()
@@ -285,6 +286,14 @@ class MainViewModel(
     private val _selectedTabIndex = MutableStateFlow(0)
     val selectedTabIndex: LiveData<Int> = _selectedTabIndex.asLiveData()
 
+    // Adds Title in DataScreen
+    private val _title = MutableStateFlow("")
+    val title: LiveData<String> = _title.asLiveData()
+
+    // Adds values of answered, not answered etc.
+    private val _paperCodeDetails = MutableStateFlow<PaperCodeDetailsResponse?>(null)
+    val paperCodeDetails: LiveData<PaperCodeDetailsResponse?> = _paperCodeDetails.asLiveData()
+
     val selectedOptions = mutableMapOf<Int, String>()
     val elapsedTimeMap = mutableMapOf<Int, Long>()
     val startTimeMap = mutableMapOf<Int, Long>()
@@ -316,11 +325,36 @@ class MainViewModel(
                     setSelectedOption(response[0].details[0].qid)
                 }
                 _error.value = null
+
+                fetchPaperCodeDetails()
             } catch (e: Exception) {
                 _error.value = e.message
             }
         }
     }
+
+    private fun fetchPaperCodeDetails() {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.fetchPaperCodeDetails(
+                    FetchDataRequest(
+                        paper_code = paperCode,
+                        email_id = emailId,
+                        exam_mode_id = examModeId,
+                        test_series_id = testSeriesId
+                    )
+                )
+                val totalSeconds = response.hrs * 3600 + response.mins * 60 + response.secs
+                _remainingCountdown.value = totalSeconds.toLong()
+                _displayCountdownTime.value = formatTime(totalSeconds.toLong())
+                _title.value = response.title // Update the title
+                _paperCodeDetails.value = response // Update the values of answered, not answered etc.
+            } catch (e: Exception) {
+                _error.value = e.message
+            }
+        }
+    }
+
 
     fun saveCurrentQuestionState(questionId: Int, option: String, elapsedTime: Long) {
         selectedOptions[questionId] = option
@@ -328,7 +362,12 @@ class MainViewModel(
     }
 
     fun initializeElapsedTime(questionId: Int) {
-        _elapsedTime.value = elapsedTimeMap[questionId] ?: 0L
+        val detail = _data.value.flatMap { it.details }.find { it.qid == questionId }
+        val initialElapsedTime = (detail?.hrs?.toLongOrNull() ?: 0L) * 3600 +
+                (detail?.mins?.toLongOrNull() ?: 0L) * 60 +
+                (detail?.secs?.toLongOrNull() ?: 0L)
+        _elapsedTime.value = initialElapsedTime
+        _displayElapsedTime.value = formatTime(initialElapsedTime)
         startTimeMap[questionId] = System.currentTimeMillis()
     }
 
@@ -339,7 +378,7 @@ class MainViewModel(
     fun updateElapsedTime(questionId: Int) {
         val currentTime = System.currentTimeMillis()
         val startTime = startTimeMap[questionId] ?: currentTime
-        _elapsedTime.value = (elapsedTimeMap[questionId] ?: 0L) + (currentTime - startTime) / 1000
+        _elapsedTime.value = (elapsedTimeMap[questionId] ?: _elapsedTime.value) + (currentTime - startTime) / 1000
         _displayElapsedTime.value = formatTime(_elapsedTime.value)
     }
 

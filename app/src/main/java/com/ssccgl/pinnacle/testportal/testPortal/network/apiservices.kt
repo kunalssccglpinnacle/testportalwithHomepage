@@ -1,13 +1,11 @@
 
 package com.ssccgl.pinnacle.testportal.network
 
-import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
-import java.util.concurrent.TimeUnit
 
 data class TestPass(
     val Product_title: String,
@@ -126,7 +124,7 @@ data class Detail(
     )
 
 
-data class ApiResponse(
+data class IndexResponse(
         val subjects: List<Subject>,
         val details: List<Detail>
     )
@@ -189,6 +187,24 @@ data class SubmitResponse(
         val status: String
     )
 
+data class PaperCodeDetailsResponse(
+    val paper_code: String,
+    val title: String,
+    val subject_id: Int,
+    val questions: Int,
+    val hrs: Int,
+    val mins: Int,
+    val secs: Int,
+    val subject_name: String,
+    val answered_count: Int,
+    val notanswered_count: Int,
+    val marked_count: Int,
+    val marked_answered_count: Int,
+    val not_visited: Int,
+    val test_type: String
+)
+
+
 
 
 
@@ -220,13 +236,17 @@ interface ApiService {
 
 
     @POST("/index")
-    suspend fun fetchData(@Body request: FetchDataRequest): List<ApiResponse>
+    suspend fun fetchData(@Body request: FetchDataRequest): List<IndexResponse>
 
     @POST("/save_next")
     suspend fun saveAnswer(@Body request: SaveAnswerRequest): SaveAnswerResponse
 
     @POST("/submit")
     suspend fun submit(@Body request: SubmitRequest): SubmitResponse
+
+    @POST("/paperCodeDetails")
+    suspend fun fetchPaperCodeDetails(@Body request: FetchDataRequest): PaperCodeDetailsResponse
+
 
 //    @POST("get_new_tests_web_endpoint") // Update with your actual endpoint
 //    suspend fun getNewTestsWeb(@Body request: List<NewTestsWebRequest>): List<NewTestsWebResponse>
