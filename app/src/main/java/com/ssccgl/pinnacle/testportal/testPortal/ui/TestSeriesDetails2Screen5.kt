@@ -68,6 +68,109 @@ fun TestSeriesDetails2Screen(
     }
 }
 
+//@Composable
+//fun TestDetailsCard(test: TestSeriesDetails2Response.AR, navController: NavController) {
+//    Card(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(8.dp),
+//        elevation = 4.dp,
+//        backgroundColor = Color(0xFFD6EAF8) // Background color
+//    ) {
+//        Column(modifier = Modifier.padding(16.dp)) {
+//            Row(verticalAlignment = Alignment.CenterVertically) {
+//                Text(
+//                    text = test.Title,
+//                    fontWeight = FontWeight.Bold,
+//                    fontSize = 18.sp,
+//                    color = Color.Black // Text color
+//                )
+//                Spacer(modifier = Modifier.weight(1f))
+//                OutlinedButton(
+//                    onClick = {
+//                        navController.navigate("data_screen/${test.test_series_id}/${test.paper_code}/${test.exam_mode_id}")
+//                    },
+//                    border = BorderStroke(1.dp, Color(0xFF8E44AD)), // Border color
+//                    colors = ButtonDefaults.outlinedButtonColors(
+//                        backgroundColor = Color.Transparent,
+//                        contentColor = Color(0xFF8E44AD)
+//                    ),
+//                    modifier = Modifier.height(30.dp) // Adjust height for better visibility
+//                ) {
+//                    Text(
+//                        text = "Attempt",
+//                        color = Color(0xFF8E44AD), // Button text color
+//                        fontSize = 12.sp
+//                    )
+//                }
+//            }
+//            Spacer(modifier = Modifier.height(8.dp))
+//            Row(verticalAlignment = Alignment.CenterVertically) {
+//                Icon(
+//                    painter = painterResource(id = R.drawable.ic_quemark),
+//                    contentDescription = null,
+//                    modifier = Modifier.size(16.dp)
+//                )
+//                Spacer(modifier = Modifier.width(4.dp))
+//                Text(
+//                    text = test.Questions.toString(),
+//                    fontSize = 14.sp,
+//                    color = Color.Black
+//                )
+//                Spacer(modifier = Modifier.width(16.dp))
+//                Icon(
+//                    painter = painterResource(id = R.drawable.img),
+//                    contentDescription = null,
+//                    modifier = Modifier.size(16.dp)
+//                )
+//                Spacer(modifier = Modifier.width(4.dp))
+//                Text(
+//                    text = test.Marks.toString(),
+//                    fontSize = 14.sp,
+//                    color = Color.Black
+//                )
+//                Spacer(modifier = Modifier.width(16.dp))
+//                Icon(
+//                    painter = painterResource(id = R.drawable.ic_time),
+//                    contentDescription = null,
+//                    modifier = Modifier.size(16.dp)
+//                )
+//                Spacer(modifier = Modifier.width(4.dp))
+//                Text(
+//                    text = test.Time.toString(),
+//                    fontSize = 14.sp,
+//                    color = Color.Black
+//                )
+//            }
+//            Spacer(modifier = Modifier.height(8.dp))
+//            Row(verticalAlignment = Alignment.CenterVertically) {
+//                Text(
+//                    text = "Syllabus | ${test.languages}",
+//                    fontSize = 14.sp,
+//                    color = Color.White,
+//                    modifier = Modifier
+//                        .background(Color(0xFF0D47A1))
+//                        .padding(horizontal = 8.dp, vertical = 4.dp)
+//                )
+//                Spacer(modifier = Modifier.weight(1f))
+//                if (test.free_status == "1") {
+//                    Text(
+//                        text = "Free Mock",
+//                        color = Color.Red,
+//                        fontSize = 14.sp
+//                    )
+//                } else {
+//                    Text(
+//                        text = "(${test.start_date} ${test.start_time})",
+//                        fontSize = 14.sp,
+//                        color = Color.Black
+//                    )
+//                }
+//            }
+//        }
+//    }
+//}
+
 @Composable
 fun TestDetailsCard(test: AR, navController: NavController) {
     Card(
@@ -75,7 +178,7 @@ fun TestDetailsCard(test: AR, navController: NavController) {
             .fillMaxWidth()
             .padding(8.dp),
         elevation = 4.dp,
-        backgroundColor = Color(0xFFD6EAF8) // Background color
+        backgroundColor = Color(0xFFD6EAF8)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -83,64 +186,56 @@ fun TestDetailsCard(test: AR, navController: NavController) {
                     text = test.Title,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = Color.Black // Text color
+                    color = Color.Black
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                OutlinedButton(
-                    onClick = {
-                        navController.navigate("data_screen/${test.test_series_id}/${test.paper_code}/${test.exam_mode_id}")
-                    },
-                    border = BorderStroke(1.dp, Color(0xFF8E44AD)), // Border color
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        backgroundColor = Color.Transparent,
-                        contentColor = Color(0xFF8E44AD)
-                    ),
-                    modifier = Modifier.height(30.dp) // Adjust height for better visibility
-                ) {
-                    Text(
-                        text = "Attempt",
-                        color = Color(0xFF8E44AD), // Button text color
-                        fontSize = 12.sp
-                    )
-                }
+//                OutlinedButton(
+//                    onClick = {
+//                        navController.navigate("data_screen/${test.test_series_id}/${test.paper_code}/${test.exam_mode_id}")
+//                    },
+//                    border = BorderStroke(1.dp, Color(0xFF8E44AD)),
+//                    colors = ButtonDefaults.outlinedButtonColors(
+//                        backgroundColor = Color.Transparent,
+//                        contentColor = Color(0xFF8E44AD)
+//                    ),
+//                    modifier = Modifier.height(30.dp)
+//                ) {
+//                    Text(
+//                        text = "Attempt",
+//                        color = Color(0xFF8E44AD),
+//                        fontSize = 12.sp
+//                    )
+//                }
             }
+
+            OutlinedButton(
+                onClick = {
+                    navController.navigate("data_screen/${test.test_series_id}/${test.paper_code}/${test.exam_mode_id}")
+                },
+                border = BorderStroke(1.dp, Color(0xFF8E44AD)),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = Color.Transparent,
+                    contentColor = Color(0xFF8E44AD)
+                ),
+                modifier = Modifier.height(30.dp)
+            ) {
+                Text(
+                    text = "Attempt",
+                    color = Color(0xFF8E44AD),
+                    fontSize = 12.sp
+                )
+            }
+
+
+
+
             Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_quemark),
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = test.Questions.toString(),
-                    fontSize = 14.sp,
-                    color = Color.Black
-                )
+                InfoIconWithText(iconId = R.drawable.ic_quemark, text = test.Questions.toString())
                 Spacer(modifier = Modifier.width(16.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.img),
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = test.Marks.toString(),
-                    fontSize = 14.sp,
-                    color = Color.Black
-                )
+                InfoIconWithText(iconId = R.drawable.img, text = test.Marks.toString())
                 Spacer(modifier = Modifier.width(16.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_time),
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = test.Time.toString(),
-                    fontSize = 14.sp,
-                    color = Color.Black
-                )
+                InfoIconWithText(iconId = R.drawable.ic_time, text = test.Time.toString())
             }
             Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -153,20 +248,30 @@ fun TestDetailsCard(test: AR, navController: NavController) {
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                if (test.free_status == "1") {
-                    Text(
-                        text = "Free Mock",
-                        color = Color.Red,
-                        fontSize = 14.sp
-                    )
-                } else {
-                    Text(
-                        text = "(${test.start_date} ${test.start_time})",
-                        fontSize = 14.sp,
-                        color = Color.Black
-                    )
-                }
+                Text(
+                    text = if (test.free_status == "1") "Free Mock" else "(${test.start_date} ${test.start_time})",
+                    color = if (test.free_status == "1") Color.Red else Color.Black,
+                    fontSize = 14.sp
+                )
             }
         }
     }
 }
+
+@Composable
+fun InfoIconWithText(iconId: Int, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            painter = painterResource(id = iconId),
+            contentDescription = null,
+            modifier = Modifier.size(16.dp)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = text,
+            fontSize = 14.sp,
+            color = Color.Black
+        )
+    }
+}
+
