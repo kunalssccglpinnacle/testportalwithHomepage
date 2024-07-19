@@ -362,7 +362,12 @@ class MainViewModel(
     }
 
     fun initializeElapsedTime(questionId: Int) {
-        _elapsedTime.value = elapsedTimeMap[questionId] ?: 0L
+        val detail = _data.value.flatMap { it.details }.find { it.qid == questionId }
+        val initialElapsedTime = (detail?.hrs?.toLongOrNull() ?: 0L) * 3600 +
+                (detail?.mins?.toLongOrNull() ?: 0L) * 60 +
+                (detail?.secs?.toLongOrNull() ?: 0L)
+        _elapsedTime.value = initialElapsedTime
+        _displayElapsedTime.value = formatTime(initialElapsedTime)
         startTimeMap[questionId] = System.currentTimeMillis()
     }
 
@@ -373,7 +378,7 @@ class MainViewModel(
     fun updateElapsedTime(questionId: Int) {
         val currentTime = System.currentTimeMillis()
         val startTime = startTimeMap[questionId] ?: currentTime
-        _elapsedTime.value = (elapsedTimeMap[questionId] ?: 0L) + (currentTime - startTime) / 1000
+        _elapsedTime.value = (elapsedTimeMap[questionId] ?: _elapsedTime.value) + (currentTime - startTime) / 1000
         _displayElapsedTime.value = formatTime(_elapsedTime.value)
     }
 
