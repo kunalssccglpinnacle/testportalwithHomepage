@@ -1,4 +1,3 @@
-
 package com.ssccgl.pinnacle.testportal.network
 
 import retrofit2.Retrofit
@@ -26,7 +25,6 @@ data class IndividualExamTestPass(
     val chapterwiseTestCount: Int,
     val previousYearTestCount: Int
 )
-
 
 data class NewTestsWebRequest(
     val email_id: String,
@@ -63,8 +61,6 @@ data class TestSeriesResponse(
     val test_series_id: Int
 )
 
-
-
 data class TestSeriesDetails2Request(
     val email_id: String,
     val test_series_id: String
@@ -76,116 +72,106 @@ data class TestSeriesDetails2Response(
 )
 
 data class AR(
-        val test_series_id: String,
-        val paper_code: String,
-        val exam_mode_id: Int,
-        val Questions: Int,
-        val Marks: Int,
-        val Time: Int,
-        val Title: String,
-        val PaperStatus: Int,
-        val RemainingTime: String,
-        val languages: String,
-        val expire_date: String,
-        val expiry_time: String?,
-        val paid_status: Int,
-        val start_date: String,
-        val start_time: String,
-        val free_status: String
-    )
+    val test_series_id: String,
+    val paper_code: String,
+    val exam_mode_id: Int,
+    val Questions: Int,
+    val Marks: Int,
+    val Time: Int,
+    val Title: String,
+    val PaperStatus: Int,
+    val RemainingTime: String,
+    val languages: String,
+    val expire_date: String,
+    val expiry_time: String?,
+    val paid_status: Int,
+    val start_date: String,
+    val start_time: String,
+    val free_status: String
+)
 
-
-    // Data classes for index
-
+// Data classes for index
 data class Subject(
-        val sb_id: Int,
-        val ppr_id: Int,
-        val subject_name: String
-    )
-
+    val sb_id: Int,
+    val ppr_id: Int,
+    val subject_name: String
+)
 
 data class Detail(
-        val qid: Int,
-        val question_id: Int,
-        val subject_id: Int,
-        val question: String,
-        val option1: String,
-        val option2: String,
-        val option3: String,
-        val option4: String,
-        val hindi_question: String,
-        val positive_marks: String,
-        val negative_marks: Double,
-        val answered_ques: Int,
-        val hrs: String,
-        val mins: String,
-        val secs: String,
-        val answer: String
-    )
-
+    val qid: Int,
+    val question_id: Int,
+    val subject_id: Int,
+    val question: String,
+    val option1: String,
+    val option2: String,
+    val option3: String,
+    val option4: String,
+    val hindi_question: String,
+    val positive_marks: String,
+    val negative_marks: Double,
+    val answered_ques: Int,
+    val hrs: String,
+    val mins: String,
+    val secs: String,
+    val answer: String
+)
 
 data class IndexResponse(
-        val subjects: List<Subject>,
-        val details: List<Detail>
-    )
+    val subjects: List<Subject>,
+    val details: List<Detail>
+)
 
-// data classes for save_next
-
-
+// Data classes for save_next
 data class SaveAnswerRequest(
-        val paper_code: String,
-        val paper_id: String,
-        val option: String,
-        val answer_status: String,
-        val email_id: String,
-        val SingleTm: String,
-        val rTem: String,
-        val test_series_id: String,
-        val exam_mode_id: String,
-        val subject: Int,
-        val CurrentPaperId: Int,
-        val SaveType: String
-    )
-
+    val paper_code: String,
+    val paper_id: String,
+    val option: String,
+    val answer_status: String,
+    val email_id: String,
+    val SingleTm: String,
+    val rTem: String,
+    val test_series_id: String,
+    val exam_mode_id: String,
+    val subject: Int,
+    val CurrentPaperId: Int,
+    val SaveType: String
+)
 
 data class SaveAnswerResponse(
-        val sub_id: Int,
-        val answer_status: Int,
-        val answer_status_new: Int,
-        val answered_count: Int,
-        val notanswered_count: Int,
-        val marked_count: Int,
-        val marked_answered_count: Int,
-        val not_visited: Int,
-        val paper_ids: Int,
-        val status: Int,
-        val subjectname: String,
-        val choosed_answer: String
-    )
+    val sub_id: Int,
+    val answer_status: Int,
+    val answer_status_new: Int,
+    val answered_count: Int,
+    val notanswered_count: Int,
+    val marked_count: Int,
+    val marked_answered_count: Int,
+    val not_visited: Int,
+    val paper_ids: Int,
+    val status: Int,
+    val subjectname: String,
+    val choosed_answer: String
+)
 
-
-// This peice has to be modified in the future as it is the request for the index
+// This piece has to be modified in the future as it is the request for the index
 data class FetchDataRequest(
-        val paper_code: String,
-        val email_id: String,
-        val exam_mode_id: String,
-        val test_series_id: String
-    )
-
+    val paper_code: String,
+    val email_id: String,
+    val exam_mode_id: String,
+    val test_series_id: String
+)
 
 // Data classes for submit request and response
 data class SubmitRequest(
-        val email_id: String,
-        val paper_code: String,
-        val exam_mode_id: String,
-        val test_series_id: String,
-        val rTem: String
-    )
-
+    val email_id: String,
+    val paper_code: String,
+    val exam_mode_id: String,
+    val test_series_id: String,
+    val rTem: String
+)
 
 data class SubmitResponse(
-        val status: String
-    )
+    val status: String
+)
 
 data class PaperCodeDetailsResponse(
     val paper_code: String,
@@ -204,15 +190,136 @@ data class PaperCodeDetailsResponse(
     val test_type: String
 )
 
+data class AttemptedRequest(
+    val paper_code: String,
+    val email_id: String,
+    val exam_mode_id: String,
+    val test_series_id: String
+)
 
+data class AttemptedResponse(
+    val Rank: Int,
+    val TotalStudent: Int,
+    val Score: Double,
+    val TotalMarks: Double,
+    val Attempted: Int,
+    val TotalQuestions: Int,
+    val Accuracy: String,
+    val Percentile: String,
+    val Totaltime: Int,
+    val TotalTimeTaken: String,
+    val Subjects: List<SubjectResult>,
+    val compare: List<Comparison>,
+    val transformedData: TransformedData,
+    val TopRanker: List<TopRanker>,
+    val graph: List<Graph>,
+    val your_score_perc: String,
+    val y_total_attempted: String,
+    val your_time_perc: String,
+    val ur: String?,
+    val ews: String?,
+    val obc: String?,
+    val sc: String?,
+    val st: String?,
+    val oh: String?,
+    val hh: String?,
+    val vh: String?,
+    val Others_PWD: String?,
+    val esm: String?,
+    val cutoff_status: Int,
+    val averageMarks: Double,
+    val medianTotalMarks: Double,
+    val ratingData: RatingData
+)
 
+data class SubjectResult(
+    val subject_id: Int,
+    val SubjectName: String,
+    val SubScore: Double,
+    val SubTotalMarks: Double,
+    val SubAttempted: Int,
+    val SubjectCorrectAttempted: Int,
+    val SubjectCorrectAttemptedPerc: String,
+    val SubjectWrongAttempted: Int,
+    val SubjectWrongAttemptedPerc: String,
+    val SubTotalQuestion: Int,
+    val SubAccuracy: String,
+    val SubTakingTime: String,
+    val SubTotalTime: Int,
+    val score_percentage: String,
+    val attempted_percentage: String,
+    val time_percentage: String
+)
 
+data class Comparison(
+    val TotalScore: Double,
+    val TotalTime: Int,
+    val YourScore: Double,
+    val your_score_perc: String,
+    val YourCorrect: Int,
+    val your_correct_perc: String,
+    val YourWrong: Int,
+    val your_wrong_perc: String,
+    val YourTime: String,
+    val your_time_perc: String,
+    val YourAccuracy: String,
+    val TopperScore: Double,
+    val topper_score_perc: String,
+    val TopperCorrect: Int,
+    val topper_correct_perc: String,
+    val TopperWrong: Int,
+    val topper_wrong_perc: String,
+    val TopperTime: String,
+    val topper_time_perc: String,
+    val TopperAccuracy: String,
+    val topperSubjects: List<SubjectResult>
+)
 
+data class TransformedData(
+    val overall: Overall,
+    val subjects: List<SubjectComparison>
+)
 
+data class Overall(
+    val user: ScoreDetail,
+    val topper: ScoreDetail
+)
 
+data class ScoreDetail(
+    val score: Double,
+    val total_marks: Double,
+    val accuracy: String,
+    val correct: Int,
+    val total_questions: Int,
+    val wrong: Int,
+    val time_taken: String,
+    val total_time: Int,
+    val score_percentage: String,
+    val correct_percentage: String,
+    val wrong_percentage: String,
+    val time_percentage: String
+)
 
+data class SubjectComparison(
+    val SubjectName: String,
+    val user: ScoreDetail,
+    val topper: ScoreDetail
+)
 
+data class TopRanker(
+    val Name: String,
+    val RankerMarks: Double
+)
 
+data class Graph(
+    val label: List<String>,
+    val data: List<Int>
+)
+
+data class RatingData(
+    val _id: String,
+    val rating: Int
+)
 
 interface ApiService {
     @GET("testpass")
@@ -221,19 +328,14 @@ interface ApiService {
     @POST("IndividualExamTestPass")
     suspend fun getIndividualExamTestPass(@Body params: Map<String, Int>): List<IndividualExamTestPass>
 
-
     @POST("NewTestsWeb")
     suspend fun getNewTestsWeb(@Body params: List<NewTestsWebRequest>): List<NewTestsWebResponse>
 
     @POST("TestSeries")
     suspend fun fetchTestSeries(@Body request: TestSeriesRequest): List<TestSeriesResponse>
 
-
     @POST("TestSeriesDetails2")
     suspend fun getTestSeriesDetails2(@Body request: TestSeriesDetails2Request): TestSeriesDetails2Response
-
-
-
 
     @POST("/index")
     suspend fun fetchData(@Body request: FetchDataRequest): List<IndexResponse>
@@ -247,20 +349,9 @@ interface ApiService {
     @POST("/paperCodeDetails")
     suspend fun fetchPaperCodeDetails(@Body request: FetchDataRequest): PaperCodeDetailsResponse
 
-
-//    @POST("get_new_tests_web_endpoint") // Update with your actual endpoint
-//    suspend fun getNewTestsWeb(@Body request: List<NewTestsWebRequest>): List<NewTestsWebResponse>
-//
-//    @POST("fetch_test_series_endpoint") // Update with your actual endpoint
-//    suspend fun fetchTestSeries(@Body request: TestSeriesRequest): List<TestSeriesResponse>
-//
-//    @POST("get_test_series_details2_endpoint") // Update with your actual endpoint
-//    suspend fun getTestSeriesDetails2(@Body request: TestSeriesDetails2Request): TestSeriesDetails2Response
-
+    @POST("/attempted")
+    suspend fun fetchAttempted(@Body request: AttemptedRequest): List<AttemptedResponse>
 }
-
-
-
 
 object RetrofitInstance {
     val api: ApiService by lazy {
@@ -271,6 +362,3 @@ object RetrofitInstance {
             .create(ApiService::class.java)
     }
 }
-
-
-
