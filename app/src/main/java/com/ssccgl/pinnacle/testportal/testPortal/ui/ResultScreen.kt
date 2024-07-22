@@ -1,97 +1,11 @@
-//package com.ssccgl.pinnacle.testportal.ui
-//
-//import androidx.compose.foundation.layout.*
-//import androidx.compose.foundation.lazy.LazyColumn
-//import androidx.compose.foundation.lazy.items
-//import androidx.compose.material3.*
-//import androidx.compose.runtime.Composable
-//import androidx.compose.runtime.getValue
-//import androidx.compose.runtime.livedata.observeAsState
-//import androidx.compose.ui.Alignment
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.text.style.TextOverflow
-//import androidx.compose.ui.unit.dp
-//import androidx.lifecycle.viewmodel.compose.viewModel
-//import androidx.navigation.NavHostController
-//import com.google.gson.GsonBuilder
-//import com.ssccgl.pinnacle.testportal.network.AttemptedResponse
-//import com.ssccgl.pinnacle.testportal.viewmodel.ResultViewModel
-//import com.ssccgl.pinnacle.testportal.viewmodel.ResultViewModelFactory
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun ResultScreen(navController: NavHostController, paperCode: String, emailId: String, examModeId: String, testSeriesId: String) {
-//    val viewModel: ResultViewModel = viewModel(factory = ResultViewModelFactory(paperCode, emailId, examModeId, testSeriesId))
-//    val result by viewModel.result.observeAsState()
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = { Text("Test Result") }
-//            )
-//        }
-//    ) { paddingValues ->
-//        Column(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(paddingValues)
-//        ) {
-//            if (result != null) {
-//                LazyColumn(
-//                    modifier = Modifier.fillMaxSize(),
-//                    contentPadding = PaddingValues(16.dp)
-//                ) {
-//                    items(result!!) { item ->
-//                        ResultItem(item = item)
-//                        Divider(modifier = Modifier.padding(vertical = 8.dp))
-//                    }
-//                }
-//            } else {
-//                Box(
-//                    modifier = Modifier.fillMaxSize(),
-//                    contentAlignment = Alignment.Center
-//                ) {
-//                    CircularProgressIndicator()
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//@Composable
-//fun ResultItem(item: AttemptedResponse) {
-//    val gson = GsonBuilder().setPrettyPrinting().create()
-//    val json = gson.toJson(item)
-//
-//    Card(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(8.dp),
-//       // elevation = 4.dp
-//    ) {
-//        Column(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(16.dp)
-//        ) {
-//            Text(
-//                text = json,
-//                style = MaterialTheme.typography.bodyMedium,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(bottom = 8.dp),
-//                overflow = TextOverflow.Clip
-//            )
-//        }
-//    }
-//}
-//
-
 package com.ssccgl.pinnacle.testportal.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.CheckCircle
@@ -106,13 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ssccgl.pinnacle.testportal.R
 import com.ssccgl.pinnacle.testportal.network.AttemptedResponse
 import com.ssccgl.pinnacle.testportal.network.TopRanker
 import com.ssccgl.pinnacle.testportal.viewmodel.ResultViewModel
@@ -146,7 +58,7 @@ fun ResultScreen(navController: NavHostController, paperCode: String, emailId: S
                         Spacer(modifier = Modifier.height(16.dp))
                         Compare(it)
                         Spacer(modifier = Modifier.height(16.dp))
-                        Toppers(it.TopRanker)
+                        Toppers(it, it.TopRanker)
                     }
                 } else {
                     Box(
@@ -167,6 +79,7 @@ fun QuickSummary(result: AttemptedResponse) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
+
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Quick Summary", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -250,13 +163,82 @@ fun SummaryItem(icon: ImageVector, title: String, value: String, color: Color) {
 
 @Composable
 fun CompareSectionalSummary(result: AttemptedResponse) {
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp)) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Compare Sectional Summary", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(8.dp))
-            // Add Compare Sectional Summary items here using properties from result.Subjects or result.compare
+            Text("Compare Sectional Summary", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                item {
+                    SectionSummaryCard(
+                        title = "Score",
+                        value = "${result.Score}/${result.TotalMarks}",
+                        color = Color(0xFF6200EE), // Purple
+                        subjects = result.Subjects.map { "${it.SubScore}/${it.SubTotalMarks} ${it.SubjectName}" }
+                    )
+                }
+                item {
+                    SectionSummaryCard(
+                        title = "Accuracy",
+                        value = "${result.Accuracy}%",
+                        color = Color(0xFF00C853), // Green
+                        subjects = result.Subjects.map { "${it.SubAccuracy} ${it.SubjectName}" }
+                    )
+                }
+                item {
+                    SectionSummaryCard(
+                        title = "Attempted",
+                        value = "${result.Attempted}/${result.TotalQuestions}",
+                        color = Color(0xFFFFC107), // Amber
+                        subjects = result.Subjects.map { "${it.SubAttempted}/${it.SubTotalQuestion} ${it.SubjectName}" }
+                    )
+                }
+                item {
+                    SectionSummaryCard(
+                        title = "Time",
+                        value = "${result.TotalTimeTaken}/${result.Totaltime}mins",
+                        color = Color(0xFF00ACC1), // Teal
+                        subjects = result.Subjects.map { "${it.SubTakingTime}/${it.SubTotalTime}mins ${it.SubjectName}" }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SectionSummaryCard(title: String, value: String, color: Color, subjects: List<String>, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .width(200.dp) // fixed width for the cards
+            .padding(vertical = 8.dp),
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .background(color)
+            )
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = color)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(value, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(16.dp))
+                subjects.forEach { subject ->
+                    Text(subject, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
         }
     }
 }
@@ -275,7 +257,7 @@ fun Compare(result: AttemptedResponse) {
 }
 
 @Composable
-fun Toppers(toppers: List<TopRanker>) {
+fun Toppers(result: AttemptedResponse, toppers: List<TopRanker>) {
     Card(modifier = Modifier
         .fillMaxWidth()
         .padding(16.dp)) {
@@ -283,10 +265,45 @@ fun Toppers(toppers: List<TopRanker>) {
             Text("Toppers", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(8.dp))
             toppers.forEachIndexed { index, topRanker ->
-                Text("${index + 1}. ${topRanker.Name} - Score: ${topRanker.RankerMarks}", style = MaterialTheme.typography.bodyMedium)
+                TopperItem(index + 1, topRanker, result.TotalMarks)
                 Spacer(modifier = Modifier.height(4.dp))
             }
         }
     }
 }
 
+@Composable
+fun TopperItem(rank: Int, topRanker: TopRanker, totalMarks: Double) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(40.dp)
+                .background(Color.Blue, shape = CircleShape)
+        ) {
+            Text(
+                text = topRanker.Name.first().toString().uppercase(),
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Column {
+            Text(
+                text = "$rank. ${topRanker.Name}",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "${topRanker.RankerMarks}/$totalMarks",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
+            )
+        }
+    }
+}
