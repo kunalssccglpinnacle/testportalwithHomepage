@@ -93,4 +93,10 @@ dependencies {
 
     implementation ("androidx.compose.runtime:runtime-livedata:1.6.8")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
+
+    // for graph
+  //  implementation ("com.github.tehras:charts:1.0.2")
+
 }
+
+

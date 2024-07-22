@@ -1,6 +1,8 @@
+
 package com.ssccgl.pinnacle.testportal.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -13,8 +15,7 @@ import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.Percent
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,8 +33,15 @@ import com.ssccgl.pinnacle.testportal.viewmodel.ResultViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ResultScreen(navController: NavHostController, paperCode: String, emailId: String, examModeId: String, testSeriesId: String) {
-    val viewModel: ResultViewModel = viewModel(factory = ResultViewModelFactory(paperCode, emailId, examModeId, testSeriesId))
+fun ResultScreen(
+    navController: NavHostController,
+    paperCode: String,
+    emailId: String,
+    examModeId: String,
+    testSeriesId: String
+) {
+    val viewModel: ResultViewModel =
+        viewModel(factory = ResultViewModelFactory(paperCode, emailId, examModeId, testSeriesId))
     val result by viewModel.result.observeAsState()
 
     Scaffold(
@@ -78,8 +86,8 @@ fun QuickSummary(result: AttemptedResponse) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
-
+            .padding(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Quick Summary", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -166,7 +174,8 @@ fun CompareSectionalSummary(result: AttemptedResponse) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Compare Sectional Summary", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
@@ -245,24 +254,147 @@ fun SectionSummaryCard(title: String, value: String, color: Color, subjects: Lis
 
 @Composable
 fun Compare(result: AttemptedResponse) {
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp)) {
+    var selectedComparison by remember { mutableStateOf("Score") }
+    val scoreComparison = result.compare.firstOrNull() ?: return
+
+    val data = when (selectedComparison) {
+        "Score" -> listOf(
+            BarData(scoreComparison.YourScore.toFloat(), "You"),
+            BarData(scoreComparison.TopperScore.toFloat(), "Topper")
+        )
+        "Accuracy" -> listOf(
+            BarData(scoreComparison.YourAccuracy.toFloat(), "You"),
+            BarData(scoreComparison.TopperAccuracy.toFloat(), "Topper")
+        )
+        "Attempt" -> listOf(
+            BarData(scoreComparison.YourCorrect.toFloat(), "You"), // Assuming YourCorrect as YourAttempt
+            BarData(scoreComparison.TopperCorrect.toFloat(), "Topper") // Assuming TopperCorrect as TopperAttempt
+        )
+        "Correct" -> listOf(
+            BarData(scoreComparison.YourCorrect.toFloat(), "You"),
+            BarData(scoreComparison.TopperCorrect.toFloat(), "Topper")
+        )
+        "Incorrect" -> listOf(
+            BarData(scoreComparison.YourWrong.toFloat(), "You"),
+            BarData(scoreComparison.TopperWrong.toFloat(), "Topper")
+        )
+        "Time" -> listOf(
+            BarData(scoreComparison.YourTime.toFloat(), "You"), // Time is typically in format HH:MM:SS and needs to be converted to a number
+            BarData(scoreComparison.TopperTime.toFloat(), "Topper")
+        )
+        else -> emptyList()
+    }
+
+    val maxValue = when (selectedComparison) {
+        "Score" -> scoreComparison.TotalScore.toFloat()
+        "Accuracy" -> 100f
+        "Attempt", "Correct", "Incorrect" -> result.TotalQuestions.toFloat()
+        "Time" -> scoreComparison.TotalTime.toFloat()
+        else -> 0f
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Compare", style = MaterialTheme.typography.titleMedium)
+            Text("Compare", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
-            // Add Compare items here using properties from result.compare
+
+            // Buttons
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                ComparisonButton("Score", selectedComparison) { selectedComparison = it }
+                ComparisonButton("Accuracy", selectedComparison) { selectedComparison = it }
+                ComparisonButton("Attempt", selectedComparison) { selectedComparison = it }
+                ComparisonButton("Correct", selectedComparison) { selectedComparison = it }
+                ComparisonButton("Incorrect", selectedComparison) { selectedComparison = it }
+                ComparisonButton("Time", selectedComparison) { selectedComparison = it }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Graph
+            BarChart(
+                bars = data,
+                maxValue = maxValue,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
         }
     }
 }
 
 @Composable
+fun ComparisonButton(label: String, selected: String, onClick: (String) -> Unit) {
+    val isSelected = selected == label
+    val backgroundColor = if (isSelected) Color(0xFF4CAF50) else Color.White
+    val contentColor = if (isSelected) Color.White else Color.Black
+
+    Box(
+        modifier = Modifier
+            .padding(4.dp)
+            .background(backgroundColor, shape = RoundedCornerShape(16.dp))
+            .clickable { onClick(label) }
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(label, color = contentColor)
+    }
+}
+
+@Composable
+fun BarChart(bars: List<BarData>, maxValue: Float, modifier: Modifier = Modifier) {
+    val barWidth = 40.dp
+    val spacing = 16.dp
+
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.Bottom,
+        modifier = modifier
+    ) {
+        bars.forEach { bar ->
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(horizontal = spacing)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(barWidth)
+                        .height((bar.value / maxValue * 200).dp)
+                        .background(Color.Green),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    Text(
+                        text = bar.value.toString(),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Black,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+                Text(text = bar.label, style = MaterialTheme.typography.bodySmall)
+            }
+        }
+    }
+}
+
+data class BarData(val value: Float, val label: String)
+
+@Composable
 fun Toppers(result: AttemptedResponse, toppers: List<TopRanker>) {
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp)) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Toppers", style = MaterialTheme.typography.titleMedium)
+            Text("Toppers", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
             toppers.forEachIndexed { index, topRanker ->
                 TopperItem(index + 1, topRanker, result.TotalMarks)
