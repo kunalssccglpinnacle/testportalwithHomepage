@@ -436,10 +436,12 @@
 //    return String.format("%02d:%02d:%02d", hours, minutes, tSecond)
 //}
 
-
 package com.ssccgl.pinnacle.testportal.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -450,14 +452,15 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.items
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
 import androidx.navigation.NavHostController
 import com.ssccgl.pinnacle.testcheck_2.HtmlText
@@ -674,25 +677,25 @@ fun DataScreen(
 
                                         OptionItem(
                                             option = currentQuestion.option1,
-                                            optionValue = "a",
+                                            optionValue = "a.",
                                             selectedOption = selectedOption,
                                             onSelectOption = { viewModel.updateSelectedOption(it) }
                                         )
                                         OptionItem(
                                             option = currentQuestion.option2,
-                                            optionValue = "b",
+                                            optionValue = "b.",
                                             selectedOption = selectedOption,
                                             onSelectOption = { viewModel.updateSelectedOption(it) }
                                         )
                                         OptionItem(
                                             option = currentQuestion.option3,
-                                            optionValue = "c",
+                                            optionValue = "c.",
                                             selectedOption = selectedOption,
                                             onSelectOption = { viewModel.updateSelectedOption(it) }
                                         )
                                         OptionItem(
                                             option = currentQuestion.option4,
-                                            optionValue = "d",
+                                            optionValue = "d.",
                                             selectedOption = selectedOption,
                                             onSelectOption = { viewModel.updateSelectedOption(it) }
                                         )
@@ -852,21 +855,44 @@ fun CircularButton(onClick: () -> Unit, text: String) {
     }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OptionItem(option: String, optionValue: String, selectedOption: String, onSelectOption: (String) -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+    val borderColor = if (selectedOption == optionValue) Color.Green else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
+            .border(BorderStroke(3.dp, borderColor), shape = RoundedCornerShape(8.dp))
+            .clickable { onSelectOption(optionValue) }
+            .padding(16.dp)
     ) {
-        RadioButton(
-            selected = selectedOption == optionValue,
-            onClick = { onSelectOption(optionValue) }
-        )
-        HtmlText(html = option)
+        Column {
+            Row {
+                Text(optionValue, style = MaterialTheme.typography.bodyLarge, color = if (selectedOption == optionValue) Color.Green else MaterialTheme.colorScheme.onSurface)
+                Spacer(modifier = Modifier.width(8.dp))
+                HtmlText(html = option)
+            }
+        }
     }
 }
+
+//@Composable
+//fun OptionItem(option: String, optionValue: String, selectedOption: String, onSelectOption: (String) -> Unit) {
+//    Row(
+//        verticalAlignment = Alignment.CenterVertically,
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(vertical = 4.dp)
+//    ) {
+//        RadioButton(
+//            selected = selectedOption == optionValue,
+//            onClick = { onSelectOption(optionValue) }
+//        )
+//        HtmlText(html = option)
+//    }
+//}
 
 fun formatTime(seconds: Long): String {
     val hours = seconds / 3600

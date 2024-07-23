@@ -1,7 +1,10 @@
-
+//
 package com.ssccgl.pinnacle.testportal.ui
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +22,12 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,6 +38,7 @@ import com.ssccgl.pinnacle.testportal.network.AttemptedResponse
 import com.ssccgl.pinnacle.testportal.network.TopRanker
 import com.ssccgl.pinnacle.testportal.viewmodel.ResultViewModel
 import com.ssccgl.pinnacle.testportal.viewmodel.ResultViewModelFactory
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,24 +66,19 @@ fun ResultScreen(
                 .padding(paddingValues)
         ) {
             item {
-                if (result != null) {
-                    val firstResult = result!!.firstOrNull()
-                    firstResult?.let {
-                        QuickSummary(it)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        CompareSectionalSummary(it)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Compare(it)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Toppers(it, it.TopRanker)
-                    }
-                } else {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                result?.firstOrNull()?.let { firstResult ->
+                    QuickSummary(firstResult)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    CompareSectionalSummary(firstResult)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Compare(firstResult)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Toppers(firstResult, firstResult.TopRanker)
+                } ?: Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
                 }
             }
         }
@@ -87,7 +91,8 @@ fun QuickSummary(result: AttemptedResponse) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Quick Summary", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -132,7 +137,7 @@ fun QuickSummary(result: AttemptedResponse) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("Best Score", fontSize = 12.sp, color = Color.Gray)
                     Text(
-                        "${result.compare[0].TopperScore}/${result.TotalMarks}",
+                        "${result.compare.getOrNull(0)?.TopperScore ?: 0}/${result.TotalMarks}",
                         fontWeight = FontWeight.Bold,
                         color = Color.Black
                     )
@@ -175,7 +180,8 @@ fun CompareSectionalSummary(result: AttemptedResponse) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Compare Sectional Summary", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
@@ -229,7 +235,8 @@ fun SectionSummaryCard(title: String, value: String, color: Color, subjects: Lis
             .width(200.dp) // fixed width for the cards
             .padding(vertical = 8.dp),
         shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column {
             Box(
@@ -263,8 +270,8 @@ fun Compare(result: AttemptedResponse) {
             BarData(scoreComparison.TopperScore.toFloat(), "Topper")
         )
         "Accuracy" -> listOf(
-            BarData(scoreComparison.YourAccuracy.toFloat(), "You"),
-            BarData(scoreComparison.TopperAccuracy.toFloat(), "Topper")
+            BarData(scoreComparison.YourAccuracy.toFloatOrNull() ?: 0f, "You"),
+            BarData(scoreComparison.TopperAccuracy.toFloatOrNull() ?: 0f, "Topper")
         )
         "Attempt" -> listOf(
             BarData(scoreComparison.YourCorrect.toFloat(), "You"), // Assuming YourCorrect as YourAttempt
@@ -278,10 +285,14 @@ fun Compare(result: AttemptedResponse) {
             BarData(scoreComparison.YourWrong.toFloat(), "You"),
             BarData(scoreComparison.TopperWrong.toFloat(), "Topper")
         )
-        "Time" -> listOf(
-            BarData(scoreComparison.YourTime.toFloat(), "You"), // Time is typically in format HH:MM:SS and needs to be converted to a number
-            BarData(scoreComparison.TopperTime.toFloat(), "Topper")
-        )
+        "Time" -> {
+            val yourTimeInSeconds = convertTimeToSeconds(scoreComparison.YourTime)
+            val topperTimeInSeconds = convertTimeToSeconds(scoreComparison.TopperTime)
+            listOf(
+                BarData(yourTimeInSeconds.toFloat(), "You"),
+                BarData(topperTimeInSeconds.toFloat(), "Topper")
+            )
+        }
         else -> emptyList()
     }
 
@@ -289,7 +300,10 @@ fun Compare(result: AttemptedResponse) {
         "Score" -> scoreComparison.TotalScore.toFloat()
         "Accuracy" -> 100f
         "Attempt", "Correct", "Incorrect" -> result.TotalQuestions.toFloat()
-        "Time" -> scoreComparison.TotalTime.toFloat()
+        "Time" -> {
+            val totalSeconds = convertTimeToSeconds(scoreComparison.TotalTime.toString())
+            if (totalSeconds > 0) totalSeconds.toFloat() else 1f
+        }
         else -> 0f
     }
 
@@ -297,23 +311,32 @@ fun Compare(result: AttemptedResponse) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Compare", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
 
             // Buttons
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                ComparisonButton("Score", selectedComparison) { selectedComparison = it }
-                ComparisonButton("Accuracy", selectedComparison) { selectedComparison = it }
-                ComparisonButton("Attempt", selectedComparison) { selectedComparison = it }
-                ComparisonButton("Correct", selectedComparison) { selectedComparison = it }
-                ComparisonButton("Incorrect", selectedComparison) { selectedComparison = it }
-                ComparisonButton("Time", selectedComparison) { selectedComparison = it }
+            Column {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    ComparisonButton("Score", selectedComparison) { selectedComparison = it }
+                    ComparisonButton("Accuracy", selectedComparison) { selectedComparison = it }
+                    ComparisonButton("Attempt", selectedComparison) { selectedComparison = it }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    ComparisonButton("Correct", selectedComparison) { selectedComparison = it }
+                    ComparisonButton("Incorrect", selectedComparison) { selectedComparison = it }
+                   // ComparisonButton("Time", selectedComparison) { selectedComparison = it }
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -324,7 +347,7 @@ fun Compare(result: AttemptedResponse) {
                 maxValue = maxValue,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(300.dp)
             )
         }
     }
@@ -335,11 +358,13 @@ fun ComparisonButton(label: String, selected: String, onClick: (String) -> Unit)
     val isSelected = selected == label
     val backgroundColor = if (isSelected) Color(0xFF4CAF50) else Color.White
     val contentColor = if (isSelected) Color.White else Color.Black
+    val borderColor = if (isSelected) Color(0xFF4CAF50) else Color.Black
 
     Box(
         modifier = Modifier
             .padding(4.dp)
             .background(backgroundColor, shape = RoundedCornerShape(16.dp))
+            .border(BorderStroke(1.dp, borderColor), shape = RoundedCornerShape(16.dp))
             .clickable { onClick(label) }
             .padding(horizontal = 16.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center
@@ -348,36 +373,77 @@ fun ComparisonButton(label: String, selected: String, onClick: (String) -> Unit)
     }
 }
 
+fun convertTimeToSeconds(time: String): Int {
+    return try {
+        val parts = time.split(":").map { it.toInt() }
+        parts[0] * 3600 + parts[1] * 60 + parts[2]
+    } catch (e: Exception) {
+        // If there's an error in parsing the time, return 0 as a fallback
+        0
+    }
+}
+
 @Composable
 fun BarChart(bars: List<BarData>, maxValue: Float, modifier: Modifier = Modifier) {
-    val barWidth = 40.dp
-    val spacing = 16.dp
+    val barWidth = 60.dp
+    val spacing = 32.dp
+    val graphHeight = 200.dp
 
-    Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.Bottom,
-        modifier = modifier
-    ) {
-        bars.forEach { bar ->
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(horizontal = spacing)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .width(barWidth)
-                        .height((bar.value / maxValue * 200).dp)
-                        .background(Color.Green),
-                    contentAlignment = Alignment.TopCenter
+    Box(modifier = modifier) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val stepSize = maxValue / 5
+            val stepHeight = size.height / 5
+
+            // Draw grid lines and labels
+            for (i in 0..5) {
+                val y = size.height - (stepHeight * i)
+                drawLine(
+                    color = Color.Gray,
+                    start = Offset(0f, y),
+                    end = Offset(size.width, y),
+                    strokeWidth = 1f,
+                    cap = StrokeCap.Round,
+                )
+                drawContext.canvas.nativeCanvas.drawText(
+                    (stepSize * i).roundToInt().toString(),
+                    0f,
+                    y - 4.dp.toPx(),
+                    android.graphics.Paint().apply {
+                        color = Color.Gray.toArgb()
+                        textSize = 12.sp.toPx()
+                    }
+                )
+            }
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.Bottom,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 20.dp)
+        ) {
+            bars.forEach { bar ->
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(horizontal = spacing)
                 ) {
-                    Text(
-                        text = bar.value.toString(),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Black,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
+                    Box(
+                        modifier = Modifier
+                            .width(barWidth)
+                            .height((bar.value / maxValue * graphHeight.value).dp)
+                            .background(Color.Green),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        Text(
+                            text = bar.value.toString(),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.Black,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                    Text(text = bar.label, style = MaterialTheme.typography.bodySmall)
                 }
-                Text(text = bar.label, style = MaterialTheme.typography.bodySmall)
             }
         }
     }
@@ -391,16 +457,30 @@ fun Toppers(result: AttemptedResponse, toppers: List<TopRanker>) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Toppers", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(8.dp))
             toppers.forEachIndexed { index, topRanker ->
-                TopperItem(index + 1, topRanker, result.TotalMarks)
+                TopperItemCard(index + 1, topRanker, result.TotalMarks)
                 Spacer(modifier = Modifier.height(4.dp))
             }
         }
+    }
+}
+
+@Composable
+fun TopperItemCard(rank: Int, topRanker: TopRanker, totalMarks: Double) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        TopperItem(rank, topRanker, totalMarks)
     }
 }
 
@@ -410,7 +490,7 @@ fun TopperItem(rank: Int, topRanker: TopRanker, totalMarks: Double) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
+            .padding(8.dp)
     ) {
         Box(
             contentAlignment = Alignment.Center,
