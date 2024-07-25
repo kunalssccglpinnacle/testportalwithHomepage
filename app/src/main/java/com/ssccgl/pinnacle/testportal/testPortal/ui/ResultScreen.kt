@@ -642,6 +642,15 @@ fun TopperItem(rank: Int, topRanker: TopRanker, totalMarks: Double) {
             .fillMaxWidth()
             .padding(8.dp)
     ) {
+        Text(
+            text = "$rank",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+            fontSize = 24.sp
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -654,19 +663,21 @@ fun TopperItem(rank: Int, topRanker: TopRanker, totalMarks: Double) {
                 fontWeight = FontWeight.Bold
             )
         }
-        Spacer(modifier = Modifier.width(16.dp))
-        Column {
-            Text(
-                text = "$rank. ${topRanker.Name}",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "${topRanker.RankerMarks}/$totalMarks",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
-            )
-        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(
+            text = topRanker.Name,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Text(
+            text = "${topRanker.RankerMarks}/$totalMarks",
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray
+        )
     }
 }
-
