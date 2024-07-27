@@ -54,11 +54,25 @@ fun ResultScreen(
     val result by viewModel.result.observeAsState()
 
     Scaffold(
-        topBar = {
+//        topBar = {
+//            TopAppBar(
+//                title = { Text("Test Result") }
+//            )
+//        }
+
+                topBar = {
             TopAppBar(
-                title = { Text("Test Result") }
+                title = { Text("Summary") },
+                actions = {
+                    TextButton(onClick = { navController.navigate("solution_screen/$paperCode/$emailId/$examModeId/$testSeriesId") }) {
+                        Text(text = "Solution", color = Color.Blue)
+                    }
+                }
             )
         }
+
+
+
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier

@@ -463,6 +463,8 @@
 //    val tSecond = seconds % 60
 //    return String.format("%02d:%02d:%02d", hours, minutes, tSecond)
 //}
+
+
 package com.ssccgl.pinnacle.testportal.ui
 
 import androidx.compose.foundation.BorderStroke
@@ -886,28 +888,6 @@ fun CircularButton(onClick: () -> Unit, text: String) {
     }
 }
 
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun OptionItem(option: String, optionValue: String, selectedOption: String, onSelectOption: (String) -> Unit) {
-//    val borderColor = if (selectedOption == optionValue) Color.Green else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-//    Box(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(vertical = 4.dp)
-//            .border(BorderStroke(3.dp, borderColor), shape = RoundedCornerShape(8.dp))
-//            .clickable { onSelectOption(optionValue) }
-//            .padding(16.dp)
-//    ) {
-//        Column {
-//            Row {
-//                Text(optionValue, style = MaterialTheme.typography.bodyLarge, color = if (selectedOption == optionValue) Color.Green else MaterialTheme.colorScheme.onSurface)
-//                Spacer(modifier = Modifier.width(8.dp))
-//                HtmlText(html = option)
-//            }
-//        }
-//    }
-//}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OptionItem(option: String, optionValue: String, selectedOption: String, onSelectOption: (String) -> Unit) {
@@ -918,15 +898,15 @@ fun OptionItem(option: String, optionValue: String, selectedOption: String, onSe
             .padding(vertical = 4.dp)
             .border(BorderStroke(3.dp, borderColor), shape = RoundedCornerShape(8.dp))
             .clickable { onSelectOption(optionValue) }
-            .padding(16.dp)
-            .padding(additionalTouchPadding) // Additional padding for touch responsiveness
+            .padding(8.dp)
+           // .padding(additionalTouchPadding) // Additional padding for touch responsiveness
     ) {
         Column {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onSelectOption(optionValue) }
-                    .padding(additionalTouchPadding) // Additional padding for touch responsiveness
+                  //  .padding(additionalTouchPadding) // Additional padding for touch responsiveness
             ) {
                 Text(optionValue, style = MaterialTheme.typography.bodyLarge, color = if (selectedOption == optionValue) Color.Blue else MaterialTheme.colorScheme.onSurface)
                 Spacer(modifier = Modifier.width(8.dp))

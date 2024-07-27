@@ -321,6 +321,59 @@ data class RatingData(
     val rating: Int
 )
 
+data class SolutionRequest(
+    val paper_code: String,
+    val email_id: String,
+    val exam_mode_id: String,
+    val test_series_id: String
+)
+
+data class SolutionResponse(
+    val subjects: List<Subjectsol>,
+    val details: List<Detailsol>
+)
+
+data class Subjectsol(
+    val sbId: Int,
+    val pprId: Int,
+    val subjectName: String
+)
+
+data class Detailsol(
+    val qid: Int,
+    val questionId: Int,
+    val subId: Int,
+    val subPrvId: Int,
+    val subjectId: Int,
+    val question: String,
+    val option1: String,
+    val option2: String,
+    val option3: String,
+    val option4: String,
+    val hindi_question: String,
+    val hindi_option1: String,
+    val hindi_option2: String,
+    val hindi_option3: String,
+    val hindi_option4: String,
+    val positiveMarks: String,
+    val answeredQues: Int,
+    val hrs: String,
+    val mins: String,
+    val secs: String,
+    val negativeMarks: Double,
+    val solution: String,
+    val hindi_solution: String,
+    val correct_answer: String,
+    val answer_type: String,
+    val choose_answer: String,
+    val correct_count: Int,
+    val incorrect_count: Int,
+    val unattempted_ques: Int,
+    val bookmark_ques: String
+)
+
+
+
 interface ApiService {
     @GET("testpass")
     suspend fun getTestPasses(): List<TestPass>
@@ -351,12 +404,18 @@ interface ApiService {
 
     @POST("/attempted")
     suspend fun fetchAttempted(@Body request: AttemptedRequest): List<AttemptedResponse>
+
+    @POST("solution")
+    suspend fun fetchSolutionData(@Body request: SolutionRequest): List<SolutionResponse>
+
 }
 
 object RetrofitInstance {
     val api: ApiService by lazy {
         Retrofit.Builder()
             .baseUrl("http://3.111.199.93:5000/")
+
+            //.baseUrl("https://onlineexam.ssccglpinnacle.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)
