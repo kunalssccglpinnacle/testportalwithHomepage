@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import com.ssccgl.pinnacle.testcheck_2.HtmlText
 import com.ssccgl.pinnacle.testportal.viewmodel.MainViewModel
 
@@ -43,7 +44,6 @@ fun DataScreen(
     val selectedOption by viewModel.selectedOption.observeAsState("")
     val isDataDisplayed by viewModel.isDataDisplayed.observeAsState(false)
 
-//    val selectedOptions = viewModel.selectedOptions
     val elapsedTimeMap = viewModel.elapsedTimeMap
 
     val remainingCountdown by viewModel.remainingCountdown.observeAsState(3600L)
@@ -56,6 +56,12 @@ fun DataScreen(
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val drawerWidth = screenWidth * 0.75f
+
+    val markedForReviewMap by viewModel.markedForReviewMap.observeAsState(emptyMap())
+    val isMarkedForReview = markedForReviewMap[currentQuestionId] ?: false
 
     LaunchedEffect(Pair(isDataDisplayed, currentQuestionId)) {
         if (isDataDisplayed) {
@@ -98,58 +104,80 @@ fun DataScreen(
         drawerState = drawerState,
         scrimColor = Color.White.copy(alpha = 0.9f),
         gesturesEnabled = true,
-        modifier = Modifier.fillMaxWidth(),
         drawerContent = {
-            LazyColumn(
+            Column(
                 modifier = Modifier
                     .fillMaxHeight()
+                    .width(drawerWidth)
                     .padding(16.dp)
             ) {
-                item {
-                    paperCodeDetails?.let {
-                        Text("Answered: ${it.answered_count}")
-                        Text("Not Answered: ${it.notanswered_count}")
-                        Text("Marked for Review: ${it.marked_count}")
-                        Text("Marked for Review and Answered: ${it.marked_answered_count}")
-                        Text("Not Visited: ${it.not_visited}")
-                        Spacer(modifier = Modifier.height(16.dp))
+                paperCodeDetails?.let {
+                    Text("Answered: ${it.answered_count}")
+                    Text("Not Answered: ${it.notanswered_count}")
+                    Text("Marked for Review: ${it.marked_count}")
+                    Text("Marked for Review and Answered: ${it.marked_answered_count}")
+                    Text("Not Visited: ${it.not_visited}")
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
+                if (drawerState.isOpen){
+                    LazyColumn(
+                        modifier = Modifier
+                            .width(drawerWidth)  // Ensure LazyColumn takes full width of the drawer
+                            .weight(1f)     // Make LazyColumn take up remaining space in the drawer
+                    ) {
+                        val buttonRows = details.chunked(5)
+                        items(buttonRows) { row ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                row.forEach { detail ->
+                                    CircularButton(
+                                        onClick = {
+                                            val currentTime = System.currentTimeMillis()
+                                            val startTime =
+                                                startTimeMap[currentQuestionId] ?: currentTime
+                                            val elapsed = elapsedTimeMap[currentQuestionId] ?: 0L
+                                            val newElapsedTime =
+                                                elapsed + (currentTime - startTime) / 1000
+                                            elapsedTimeMap[currentQuestionId] = newElapsedTime
+
+                                            viewModel.saveAnswer(
+                                                paperId = currentQuestionId,
+                                                option = viewModel.validateOption(selectedOption),
+                                                subject = detail.subject_id,
+                                                currentPaperId = detail.qid,
+                                                remainingTime = formatTime(remainingCountdown),
+                                                singleTm = formatTime(newElapsedTime),
+                                                saveType = "nav",
+                                                answerStatus = if (isMarkedForReview) "4" else "1"
+                                            )
+
+                                            viewModel.moveToQuestion(detail.qid)
+                                            coroutineScope.launch { drawerState.close() }
+                                        },
+                                        text = detail.qid.toString()
+                                    )
+                                }
+                            }
+                            Spacer(Modifier.padding(4.dp))
+                        }
                     }
                 }
 
-                val buttonRows = details.chunked(5)
-                items(buttonRows) { row ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(0.8f),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        row.forEach { detail ->
-                            CircularButton(
-                                onClick = {
-                                    val currentTime = System.currentTimeMillis()
-                                    val startTime = startTimeMap[currentQuestionId] ?: currentTime
-                                    val elapsed = elapsedTimeMap[currentQuestionId] ?: 0L
-                                    val newElapsedTime = elapsed + (currentTime - startTime) / 1000
-                                    elapsedTimeMap[currentQuestionId] = newElapsedTime
+                Spacer(modifier = Modifier.height(16.dp)) // Add space between LazyColumn and Submit button
 
-                                    viewModel.saveAnswer(
-                                        paperId = currentQuestionId,
-                                        option = viewModel.validateOption(selectedOption),
-                                        subject = detail.subject_id,
-                                        currentPaperId = detail.qid,
-                                        remainingTime = formatTime(remainingCountdown),
-                                        singleTm = formatTime(newElapsedTime),
-                                        saveType = "nav",
-                                        answerStatus = "4"
-                                    )
-
-                                    viewModel.moveToQuestion(detail.qid)
-                                    coroutineScope.launch { drawerState.close() }
-                                },
-                                text = detail.qid.toString()
-                            )
-                        }
-                    }
-                    Spacer(Modifier.padding(4.dp))
+                Button(
+                    onClick = {
+                        viewModel.submit()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red
+                    ),
+                    modifier = Modifier.align(Alignment.CenterHorizontally) // Align the button to the center horizontally
+                ) {
+                    Text("Submit", color = Color.White)
                 }
             }
         },
@@ -157,7 +185,6 @@ fun DataScreen(
             Scaffold(
                 topBar = {
                     TopAppBar(
-//                        title = { Text("Pinnacle SSC CGL Tier I") },
                         title = { Text(title) },
                         actions = {
                             IconButton(onClick = {
@@ -165,7 +192,7 @@ fun DataScreen(
                             }) {
                                 Icon(imageVector = Icons.Default.Menu, contentDescription = "Open Drawer")
                             }
-                        }
+                        },
                     )
                 }
             ) { paddingValues ->
@@ -284,7 +311,7 @@ fun DataScreen(
                                                             remainingTime = formatTime(remainingCountdown),
                                                             singleTm = formatTime(newElapsedTime),
                                                             saveType = "nxt",
-                                                            answerStatus = "1"
+                                                            answerStatus = if (isMarkedForReview) "4" else "1"
                                                         )
 
                                                         viewModel.moveToPreviousQuestion()
@@ -313,7 +340,7 @@ fun DataScreen(
                                                             remainingTime = formatTime(remainingCountdown),
                                                             singleTm = formatTime(newElapsedTime),
                                                             saveType = "nxt",
-                                                            answerStatus = "1"
+                                                            answerStatus = if (isMarkedForReview) "4" else "1"
                                                         )
 
                                                         viewModel.moveToNextQuestion()
@@ -323,16 +350,16 @@ fun DataScreen(
                                                 }
                                             }
 
-                                            // Add the Submit button here
+                                            // Mark for Review Button
                                             Button(
                                                 onClick = {
-                                                    viewModel.submit()
+                                                    viewModel.toggleMarkForReview(currentQuestionId)
                                                 },
                                                 colors = ButtonDefaults.buttonColors(
-                                                    containerColor = Color.Red
+                                                    containerColor = if (isMarkedForReview) Color.Green else Color.Gray
                                                 )
                                             ) {
-                                                Text("Submit", color = Color.White)
+                                                Text(if (isMarkedForReview) "Marked for Review" else "Mark for Review")
                                             }
                                         }
                                     }
@@ -357,7 +384,7 @@ fun DataScreen(
 fun CircularButton(onClick: () -> Unit, text: String) {
     Surface(
         modifier = Modifier
-            .size(48.dp)
+            .size(32.dp)
             .clip(CircleShape)
             .background(Color(0xFFAB47BC))
             .padding(4.dp),

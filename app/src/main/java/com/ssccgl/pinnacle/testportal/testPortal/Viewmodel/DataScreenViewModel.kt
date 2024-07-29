@@ -72,6 +72,9 @@ class MainViewModel(
     private val _paperCodeDetails = MutableStateFlow<PaperCodeDetailsResponse?>(null)
     val paperCodeDetails: LiveData<PaperCodeDetailsResponse?> = _paperCodeDetails.asLiveData()
 
+    private val _markedForReviewMap = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
+    val markedForReviewMap: LiveData<Map<Int, Boolean>> = _markedForReviewMap.asLiveData()
+
 
     val selectedOptions = mutableMapOf<Int, String>()
     val elapsedTimeMap = mutableMapOf<Int, Long>()
@@ -219,6 +222,17 @@ class MainViewModel(
 
     fun validateOption(option: String): String {
         return if (option in listOf("a", "b", "c", "d")) option else ""
+    }
+
+    fun toggleMarkForReview(questionId: Int) {
+        val currentMarkedStatus = _markedForReviewMap.value[questionId] ?: false
+        _markedForReviewMap.value = _markedForReviewMap.value.toMutableMap().apply {
+            put(questionId, !currentMarkedStatus)
+        }
+    }
+
+    fun isMarkedForReview(questionId: Int): Boolean {
+        return _markedForReviewMap.value[questionId] ?: false
     }
 
     fun saveAnswer(
