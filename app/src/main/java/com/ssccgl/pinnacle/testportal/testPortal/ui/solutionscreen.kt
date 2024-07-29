@@ -220,6 +220,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ssccgl.pinnacle.testportal.viewmodel.SolutionViewModel
 import com.ssccgl.pinnacle.testportal.network.SolutionRequest
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.viewinterop.AndroidView
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -245,7 +246,7 @@ fun SolutionScreen(
                 title = { Text("Solution") },
                 actions = {
                     IconButton(onClick = { isHindi = !isHindi }) {
-                        Text(if (isHindi) "EN" else "HI")
+                        Text(if (isHindi) "ENGLISH" else "HINDI")
                     }
                     IconButton(onClick = { /* Add your action here */ }) {
                         Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
@@ -294,6 +295,22 @@ fun SolutionScreen(
                             .padding(16.dp),
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
+
+
+
+                        Column(modifier = Modifier.padding(bottom = 16.dp)) {
+                            ColorCodedLabel(color = Color.Green, text = "Attempted:${currentQuestion.correct_count}")
+                            ColorCodedLabel(color = Color.Red, text = "Incorrect:${currentQuestion.incorrect_count} ")
+                            ColorCodedLabel(color = Color.Gray, text = "Unattempted:${currentQuestion.unattempted_ques}")
+                            ColorCodedLabel(color = Color(0xFFFFA500), text = "Bookmark:${currentQuestion.bookmark_ques}")
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+
+
+
+
+
+
                         LazyColumn(modifier = Modifier.weight(1f)) {
                             item {
                                 val questionHtml = if (isHindi) currentQuestion.hindi_question else currentQuestion.question
@@ -350,6 +367,23 @@ fun SolutionScreen(
     }
 }
 
+
+@Composable
+fun ColorCodedLabel(color: Color, text: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(vertical = 4.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(16.dp)
+                .background(color)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = text, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
 @Composable
 fun OptionItem(
     option: String,
@@ -381,17 +415,4 @@ fun OptionItem(
     }
 }
 
-//@Composable
-//fun HtmlText3(html: String) {
-//    val context = LocalContext.current
-//    AndroidView(
-//        factory = {
-//            TextView(context).apply {
-//                text = android.text.Html.fromHtml(html)
-//            }
-//        },
-//        update = {
-//            it.text = android.text.Html.fromHtml(html)
-//        }
-//    )
-//}
+
