@@ -1,4 +1,5 @@
-package com.ssccgl.pinnacle.testcheck_2
+
+package com.ssccgl.pinnacle.testportal.ui
 
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -21,17 +22,34 @@ import androidx.compose.ui.viewinterop.AndroidView
 fun HtmlText(html: String) {
     var webView: WebView? by remember { mutableStateOf<WebView?>(null) }
     val currentHtml by rememberUpdatedState(html)
+    var isLoading by remember { mutableStateOf(true) }
 
-    AndroidView(
-        factory = { context ->
-            WebView(context).apply {
-                webViewClient = WebViewClient()
-                loadData(currentHtml, "text/html", "UTF-8")
-                webView = this
-            }
-        },
-        update = {
-            webView?.loadData(currentHtml, "text/html", "UTF-8")
+    Box(modifier = Modifier.fillMaxSize()) {
+        AndroidView(
+            factory = { context ->
+                WebView(context).apply {
+                    webViewClient = object : WebViewClient() {
+                        override fun onPageFinished(view: WebView?, url: String?) {
+                            super.onPageFinished(view, url)
+                            isLoading = false
+                        }
+                    }
+                    loadDataWithBaseURL(null, currentHtml, "text/html", "UTF-8", null)
+                    webView = this
+                }
+            },
+            update = {
+                webView?.loadDataWithBaseURL(null, currentHtml, "text/html", "UTF-8", null)
+            },
+            modifier = Modifier.fillMaxSize()
+        )
+
+        if (isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(50.dp)
+            )
         }
-    )
+    }
 }

@@ -1,5 +1,6 @@
 package com.ssccgl.pinnacle.testportal.ui
 
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -8,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
 import com.ssccgl.pinnacle.testportal.network.RetrofitInstance
+import com.ssccgl.pinnacle.testportal.network.SolutionRequest
 import com.ssccgl.pinnacle.testportal.repository.TestRepository
 import com.ssccgl.pinnacle.testportal.testPortal.Viewmodel.IndividualExamTestPassViewModel2
 import com.ssccgl.pinnacle.testportal.testPortal.Viewmodel.NewTestsWebViewModel
@@ -19,6 +21,7 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
     val testPassViewModel: TestPassViewModel = viewModel()
     val individualExamTestPassViewModel: IndividualExamTestPassViewModel2 = viewModel()
     val newTestsWebViewModel: NewTestsWebViewModel = viewModel()
+    val solutionViewModel: SolutionViewModel = viewModel()
     val testSeriesViewModelFactory = TestSeriesViewModelFactory(TestRepository(RetrofitInstance.api))
     val testSeriesViewModel: TestSeriesViewModel = viewModel(factory = testSeriesViewModelFactory)
 
@@ -57,23 +60,20 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
             )
         }
         composable(
-            route = "test_series_screen/{emailId}/{tierId}/{examModeId}/{newTestsWebResponseJson}",
+            route = "test_series_screen/{emailId}/{tierId}/{examModeId}",
             arguments = listOf(
                 navArgument("emailId") { type = NavType.StringType },
                 navArgument("tierId") { type = NavType.StringType },
-                navArgument("examModeId") { type = NavType.IntType },
-                navArgument("newTestsWebResponseJson") { type = NavType.StringType }
+                navArgument("examModeId") { type = NavType.IntType }
             )
         ) { backStackEntry ->
             val emailId = backStackEntry.arguments?.getString("emailId") ?: ""
             val tierId = backStackEntry.arguments?.getString("tierId") ?: ""
             val examModeId = backStackEntry.arguments?.getInt("examModeId") ?: 0
-            val newTestsWebResponseJson = backStackEntry.arguments?.getString("newTestsWebResponseJson") ?: ""
             TestSeriesScreen(
                 emailId = emailId,
                 tierId = tierId,
                 examModeId = examModeId,
-                newTestsWebResponseJson = newTestsWebResponseJson,
                 navController = navController
             )
         }
@@ -110,8 +110,71 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
                 testSeriesId = testSeriesId,
                 paperCode = paperCode,
                 examModeId = examModeId,
+                navController = navController,
                 viewModel = viewModel(factory = viewModelFactory)
             )
+        }
+        composable(
+            route = "result_screen/{paperCode}/{emailId}/{examModeId}/{testSeriesId}",
+            arguments = listOf(
+                navArgument("paperCode") { type = NavType.StringType },
+                navArgument("emailId") { type = NavType.StringType },
+                navArgument("examModeId") { type = NavType.StringType },
+                navArgument("testSeriesId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val paperCode = backStackEntry.arguments?.getString("paperCode") ?: ""
+            val emailId = backStackEntry.arguments?.getString("emailId") ?: ""
+            val examModeId = backStackEntry.arguments?.getString("examModeId") ?: ""
+            val testSeriesId = backStackEntry.arguments?.getString("testSeriesId") ?: ""
+            ResultScreen(
+                navController = navController,
+                paperCode = paperCode,
+                emailId = emailId,
+                examModeId = examModeId,
+                testSeriesId = testSeriesId
+            )
+        }
+        composable(
+            route = "instructions_screen/{testSeriesName}/{marks}/{time}/{testSeriesId}/{paperCode}/{examModeId}/{questions}",
+            arguments = listOf(
+                navArgument("testSeriesName") { type = NavType.StringType },
+                navArgument("marks") { type = NavType.StringType },
+                navArgument("time") { type = NavType.StringType },
+                navArgument("testSeriesId") { type = NavType.StringType },
+                navArgument("paperCode") { type = NavType.StringType },
+                navArgument("examModeId") { type = NavType.StringType },
+                navArgument("questions") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val testSeriesName = backStackEntry.arguments?.getString("testSeriesName") ?: ""
+            val marks = backStackEntry.arguments?.getString("marks") ?: "0"
+            val time = backStackEntry.arguments?.getString("time") ?: "0"
+            val testSeriesId = backStackEntry.arguments?.getString("testSeriesId") ?: ""
+            val paperCode = backStackEntry.arguments?.getString("paperCode") ?: ""
+            val examModeId = backStackEntry.arguments?.getString("examModeId") ?: ""
+            val questions = backStackEntry.arguments?.getString("questions") ?: ""
+            InstructionsScreen(navController, testSeriesName, marks, time, testSeriesId, paperCode, examModeId, questions)
+        }
+        composable(
+            route = "solution_screen/{paperCode}/{emailId}/{examModeId}/{testSeriesId}",
+            arguments = listOf(
+                navArgument("paperCode") { type = NavType.StringType },
+                navArgument("emailId") { type = NavType.StringType },
+                navArgument("examModeId") { type = NavType.StringType },
+                navArgument("testSeriesId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val paperCode = backStackEntry.arguments?.getString("paperCode") ?: ""
+            val emailId = backStackEntry.arguments?.getString("emailId") ?: ""
+            val examModeId = backStackEntry.arguments?.getString("examModeId") ?: ""
+            val testSeriesId = backStackEntry.arguments?.getString("testSeriesId") ?: ""
+            if (paperCode.isNotBlank() && emailId.isNotBlank() && examModeId.isNotBlank() && testSeriesId.isNotBlank()) {
+                val request = SolutionRequest(paperCode, emailId, examModeId, testSeriesId)
+                SolutionScreen(viewModel = solutionViewModel, request = request)
+            } else {
+                Text("Error: Missing or invalid arguments")
+            }
         }
     }
 }

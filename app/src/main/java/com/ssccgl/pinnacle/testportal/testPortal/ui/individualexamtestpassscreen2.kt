@@ -64,13 +64,17 @@ fun IndividualExamTestPassScreen(
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
             } else {
-                LazyColumn {
-                    items(examTestPasses) { examTestPass ->
-                        StyledCard(examTestPass, navController)
-                    }
+
+
+        }
+
+            LazyColumn {
+                items(examTestPasses) { examTestPass ->
+                    StyledCard(examTestPass, navController)
                 }
             }
         }
+
     }
 }
 
