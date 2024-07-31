@@ -1,5 +1,8 @@
 package com.ssccgl.pinnacle.testportal.ui
 
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -19,6 +22,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.NavHostController
 
 import com.ssccgl.pinnacle.testportal.viewmodel.MainViewModel
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +67,9 @@ fun DataScreen(
 
     var showDialog by remember { mutableStateOf(false) }
 
+    var swipeTriggered by remember { mutableStateOf(false) }
+
+
     LaunchedEffect(Pair(isDataDisplayed, currentQuestionId)) {
         if (isDataDisplayed) {
             val currentQuestion = details.find { it.qid == currentQuestionId }
@@ -100,9 +107,52 @@ fun DataScreen(
         }
     }
 
+    val draggableState = rememberDraggableState { delta ->
+        if (abs(delta) > 50 && !swipeTriggered) {
+            swipeTriggered = true
+            if (delta > 0) {
+                // Swipe right
+                val currentQuestion = details.find { it.qid == currentQuestionId }
+                if (currentQuestion != null && currentQuestionId > 1) {
+                    viewModel.saveAnswer(
+                        paperId = currentQuestion.qid,
+                        option = viewModel.validateOption(selectedOption),
+                        subject = currentQuestion.subject_id,
+                        currentPaperId = currentQuestionId - 1,
+                        remainingTime = formatTime(remainingCountdown),
+                        singleTm = formatTime(elapsedTime),
+                        saveType = "nxt",
+                        answerStatus = if (isMarkedForReview) "4" else "1"
+                    )
+                    viewModel.moveToPreviousQuestion()
+                }
+            } else {
+                // Swipe left
+                val currentQuestion = details.find { it.qid == currentQuestionId }
+                if (currentQuestion != null && currentQuestionId < details.maxOf { it.qid }) {
+                    viewModel.saveAnswer(
+                        paperId = currentQuestion.qid,
+                        option = viewModel.validateOption(selectedOption),
+                        subject = currentQuestion.subject_id,
+                        currentPaperId = currentQuestionId + 1,
+                        remainingTime = formatTime(remainingCountdown),
+                        singleTm = formatTime(elapsedTime),
+                        saveType = "nxt",
+                        answerStatus = if (isMarkedForReview) "4" else "1"
+                    )
+                    viewModel.moveToNextQuestion()
+                }
+            }
+            // Reset the flag after a short delay
+            coroutineScope.launch {
+                delay(300)
+                swipeTriggered = false
+            }
+        }
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
-//        scrimColor = Color.White.copy(alpha = 0.9f),
         scrimColor = Color.White,
         gesturesEnabled = true,
         drawerContent = {
@@ -149,7 +199,7 @@ fun DataScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                if (drawerState.isOpen){
+                if (drawerState.isOpen) {
                     LazyColumn(
                         modifier = Modifier
                             .width(drawerWidth)  // Ensure LazyColumn takes full width of the drawer
@@ -226,204 +276,180 @@ fun DataScreen(
                             }
                         },
                     )
-                }
-            ) { paddingValues ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                ) {
-                    val tabTitles = data.flatMap { it.subjects }.map { it.subject_name }
-                    val selectedTabIndex by viewModel.selectedTabIndex.observeAsState(0)
+                },
+                bottomBar = {
+                    val currentQuestion = details.find { it.qid == currentQuestionId }
+                    if (currentQuestion != null) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            if (currentQuestionId < details.maxOf { it.qid }) {
+                                CustomButton(
+                                    text = "Save & Next",
+                                    onClick = {
+                                        viewModel.saveAnswer(
+                                            paperId = currentQuestion.qid,
+                                            option = viewModel.validateOption(selectedOption),
+                                            subject = currentQuestion.subject_id,
+                                            currentPaperId = currentQuestionId + 1,
+                                            remainingTime = formatTime(remainingCountdown),
+                                            singleTm = formatTime(elapsedTime),
+                                            saveType = "nxt",
+                                            answerStatus = if (isMarkedForReview) "4" else "1"
+                                        )
+                                        viewModel.moveToNextQuestion()
+                                    },
+                                    backgroundColor = Color(0xFF6200EE),
+                                    textColor = Color.White
+                                )
+                            }
 
-                    TabRow(selectedTabIndex = selectedTabIndex) {
-                        tabTitles.forEachIndexed { index, title ->
-                            Tab(
-                                selected = selectedTabIndex == index,
+                            // Clear Response Button
+                            CustomButton(
+                                text = "Clear Response",
                                 onClick = {
-                                    viewModel.moveToSection(index)
+                                    viewModel.clearResponse()
                                 },
-                                text = { Text(title) }
+                                backgroundColor = Color.White,
+                                textColor = Color.Black,
+                                borderColor = Color.Black,
+                                fontSize = 10
+                            )
+
+                            // Mark for Review Button
+                            CustomButton(
+                                text = if (isMarkedForReview) "Marked for Review" else "Mark for Review",
+                                onClick = { viewModel.toggleMarkForReview(currentQuestionId) },
+                                backgroundColor = if (isMarkedForReview) Color.Cyan else Color.Gray,
+                                textColor = Color.White,
+                                fontSize = 10
                             )
                         }
                     }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                }
+            ) { paddingValues ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .draggable(
+                            state = draggableState,
+                            orientation = Orientation.Horizontal,
+                            onDragStopped = { /* Do nothing */ }
+                        )
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        Text(
-                            text = "Countdown: $displayCountdownTime",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        Text(
-                            text = "Time: $displayElapsedTime",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
+                        val tabTitles = data.flatMap { it.subjects }.map { it.subject_name }
+                        val selectedTabIndex by viewModel.selectedTabIndex.observeAsState(0)
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                        TabRow(selectedTabIndex = selectedTabIndex) {
+                            tabTitles.forEachIndexed { index, title ->
+                                Tab(
+                                    selected = selectedTabIndex == index,
+                                    onClick = {
+                                        viewModel.moveToSection(index)
+                                    },
+                                    text = { Text(title) }
+                                )
+                            }
+                        }
 
-                    if (error != null) {
-                        Text(
-                            text = error ?: "Unknown error",
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    } else {
-                        val currentQuestion = details.find { it.qid == currentQuestionId }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Countdown: $displayCountdownTime",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = "Time: $displayElapsedTime",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
 
-                        if (currentQuestion != null) {
-                            viewModel.setIsDataDisplayed(true)
-                            Column(
-                                modifier = Modifier.weight(1f),
-                                verticalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                LazyColumn(
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        if (error != null) {
+                            Text(
+                                text = error ?: "Unknown error",
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        } else {
+                            val currentQuestion = details.find { it.qid == currentQuestionId }
+
+                            if (currentQuestion != null) {
+                                viewModel.setIsDataDisplayed(true)
+                                Column(
                                     modifier = Modifier.weight(1f),
                                     verticalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    item {
-                                        HtmlText(html = currentQuestion.question)
-                                        Spacer(modifier = Modifier.height(16.dp))
+                                    LazyColumn(
+                                        modifier = Modifier.weight(1f),
+                                        verticalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        item {
+                                            HtmlText(html = currentQuestion.question)
+                                            Spacer(modifier = Modifier.height(16.dp))
 
-                                        OptionItem(
-                                            option = currentQuestion.option1,
-                                            optionValue = "a",
-                                            selectedOption = selectedOption,
-                                            onSelectOption = { viewModel.updateSelectedOption(it) }
-                                        )
-                                        OptionItem(
-                                            option = currentQuestion.option2,
-                                            optionValue = "b",
-                                            selectedOption = selectedOption,
-                                            onSelectOption = { viewModel.updateSelectedOption(it) }
-                                        )
-                                        OptionItem(
-                                            option = currentQuestion.option3,
-                                            optionValue = "c",
-                                            selectedOption = selectedOption,
-                                            onSelectOption = { viewModel.updateSelectedOption(it) }
-                                        )
-                                        OptionItem(
-                                            option = currentQuestion.option4,
-                                            optionValue = "d",
-                                            selectedOption = selectedOption,
-                                            onSelectOption = { viewModel.updateSelectedOption(it) }
-                                        )
+                                            OptionItem(
+                                                option = currentQuestion.option1,
+                                                optionValue = "a",
+                                                selectedOption = selectedOption,
+                                                onSelectOption = { viewModel.updateSelectedOption(it) }
+                                            )
+                                            OptionItem(
+                                                option = currentQuestion.option2,
+                                                optionValue = "b",
+                                                selectedOption = selectedOption,
+                                                onSelectOption = { viewModel.updateSelectedOption(it) }
+                                            )
+                                            OptionItem(
+                                                option = currentQuestion.option3,
+                                                optionValue = "c",
+                                                selectedOption = selectedOption,
+                                                onSelectOption = { viewModel.updateSelectedOption(it) }
+                                            )
+                                            OptionItem(
+                                                option = currentQuestion.option4,
+                                                optionValue = "d",
+                                                selectedOption = selectedOption,
+                                                onSelectOption = { viewModel.updateSelectedOption(it) }
+                                            )
 
-                                        Spacer(modifier = Modifier.height(16.dp))
-                                    }
-
-                                    item {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween
-                                        ) {
-                                            if (currentQuestionId > 1) {
-                                                Button(
-                                                    onClick = {
-                                                        val currentTime = System.currentTimeMillis()
-                                                        val startTime = startTimeMap[currentQuestionId] ?: currentTime
-                                                        val elapsed = elapsedTimeMap[currentQuestionId] ?: 0L
-                                                        val newElapsedTime = elapsed + (currentTime - startTime) / 1000
-                                                        elapsedTimeMap[currentQuestionId] = newElapsedTime
-
-                                                        val previousQuestionId = currentQuestionId - 1
-
-                                                        viewModel.saveAnswer(
-                                                            paperId = currentQuestion.qid,
-                                                            option = viewModel.validateOption(selectedOption),
-                                                            subject = currentQuestion.subject_id,
-                                                            currentPaperId = previousQuestionId,
-                                                            remainingTime = formatTime(remainingCountdown),
-                                                            singleTm = formatTime(newElapsedTime),
-                                                            saveType = "nxt",
-                                                            answerStatus = if (isMarkedForReview) "4" else "1"
-                                                        )
-
-                                                        viewModel.moveToPreviousQuestion()
-                                                    },
-                                                ) {
-                                                    Text("Previous")
-                                                }
-                                            }
-
-                                            if (currentQuestionId < details.maxOf { it.qid }) {
-                                                Button(
-                                                    onClick = {
-                                                        val currentTime = System.currentTimeMillis()
-                                                        val startTime = startTimeMap[currentQuestionId] ?: currentTime
-                                                        val elapsed = elapsedTimeMap[currentQuestionId] ?: 0L
-                                                        val newElapsedTime = elapsed + (currentTime - startTime) / 1000
-                                                        elapsedTimeMap[currentQuestionId] = newElapsedTime
-
-                                                        val nextQuestionId = currentQuestionId + 1
-
-                                                        viewModel.saveAnswer(
-                                                            paperId = currentQuestion.qid,
-                                                            option = viewModel.validateOption(selectedOption),
-                                                            subject = currentQuestion.subject_id,
-                                                            currentPaperId = nextQuestionId,
-                                                            remainingTime = formatTime(remainingCountdown),
-                                                            singleTm = formatTime(newElapsedTime),
-                                                            saveType = "nxt",
-                                                            answerStatus = if (isMarkedForReview) "4" else "1"
-                                                        )
-
-                                                        viewModel.moveToNextQuestion()
-                                                    },
-                                                ) {
-                                                    Text("Save and Next")
-                                                }
-                                            }
-
-                                            // Mark for Review Button
-                                            Button(
-                                                onClick = {
-                                                    viewModel.toggleMarkForReview(currentQuestionId)
-                                                },
-                                                colors = ButtonDefaults.buttonColors(
-                                                    containerColor = if (isMarkedForReview) Color.Green else Color.Gray
-                                                )
-                                            ) {
-                                                Text(if (isMarkedForReview) "Marked for Review" else "Mark for Review")
-                                            }
-                                            // Clear Response Button
-                                            Button(
-                                                onClick = {
-                                                    viewModel.clearResponse()
-                                                },
-                                                colors = ButtonDefaults.buttonColors(
-                                                    containerColor = Color.LightGray
-                                                )
-                                            ) {
-                                                Text("Clear Response", color = Color.Black)
-                                            }
+                                            Spacer(modifier = Modifier.height(16.dp))
                                         }
                                     }
                                 }
+                            } else {
+                                viewModel.setIsDataDisplayed(false)
+                                Text(
+                                    text = "Questions are loading...",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                )
                             }
-                        } else {
-                            viewModel.setIsDataDisplayed(false)
-                            Text(
-                                text = "Questions are loading...",
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            )
                         }
                     }
                 }
             }
         }
     )
-    if (showDialog && paperCodeDetails != null) {
+
+    if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
+            title = {Text("Test Submission")},
             confirmButton = {
                 Button(
                     onClick = {
@@ -446,7 +472,7 @@ fun DataScreen(
                     Text("Do you want to submit the test?")
                     Spacer(modifier = Modifier.height(8.dp))
                     paperCodeDetails?.let {
-                        Text("Time Remaining: ${it.hrs}:${it.mins}:${it.secs}")
+                        Text("Time Remaining: $displayCountdownTime")
                         Text("Answered: ${it.answered_count}")
                         Text("Not Answered: ${it.notanswered_count}")
                         Text("Marked for Review: ${it.marked_count}")

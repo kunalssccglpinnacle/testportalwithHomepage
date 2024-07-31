@@ -93,7 +93,9 @@ class MainViewModel(
                         test_series_id = testSeriesId
                     )
                 )
+
                 _data.value = response
+
                 // Initialize selectedOptions and answerTyp
                 val initialAnswerTyp = mutableMapOf<Int, Int>()
                 val initialMarkedForReviewMap = mutableMapOf<Int, Boolean>()
@@ -120,6 +122,10 @@ class MainViewModel(
                 _error.value = e.message
             }
         }
+    }
+
+    fun setCurrentQuestionId(questionId: Int) {
+        _currentQuestionId.value = questionId
     }
 
     private fun fetchPaperCodeDetails() {
@@ -161,14 +167,11 @@ class MainViewModel(
                 val hours = it.hrs.toLongOrNull() ?: 0L
                 val minutes = it.mins.toLongOrNull() ?: 0L
                 val seconds = it.secs.toLongOrNull() ?: 0L
-                Log.d("initializeElapsedTime", "Initial elapsed time for question $questionId: ${hours}h ${minutes}m ${seconds}s")
                 hours * 3600 + minutes * 60 + seconds
             } ?: 0L
-            Log.d("initializeElapsedTime", "Setting initial elapsed time for question $questionId: $initialElapsedTime seconds")
             elapsedTimeMap[questionId] = initialElapsedTime // Ensure it is stored in the map
             initialElapsedTime
         }
-        Log.d("initializeElapsedTime", "Previous elapsed time for question $questionId: $previousElapsedTime seconds")
         _elapsedTime.value = previousElapsedTime
         _displayElapsedTime.value = formatTime(previousElapsedTime)
         startTimeMap[questionId] = System.currentTimeMillis()
@@ -224,6 +227,7 @@ class MainViewModel(
         _selectedOption.value = validatedOption
     }
 
+
     fun updateAnswerTyp(qid: Int, option: String) {
         val isMarkedForReview = markedForReviewMap.value?.get(qid) ?: false
         val newAnswerType = when {
@@ -237,6 +241,7 @@ class MainViewModel(
         }
         answerTyp.value = answerTyp.value.toMutableMap().apply { put(qid, newAnswerType) }
     }
+
 
     fun moveToPreviousQuestion() {
         val previousQuestionId = _currentQuestionId.value - 1
@@ -265,7 +270,7 @@ class MainViewModel(
         }
     }
 
-    private fun isMarkedForReview(questionId: Int): Boolean {
+    fun isMarkedForReview(questionId: Int): Boolean {
         return _markedForReviewMap.value[questionId] ?: false
     }
 
@@ -345,8 +350,9 @@ class MainViewModel(
                         rTem = formatTime(_remainingCountdown.value)
                     )
                 )
-                // Navigate to result screen with necessary parameters
+                // Navigation Handled
                 navController.navigate("result_screen/$paperCode/$emailId/$examModeId/$testSeriesId")
+
             } catch (e: SocketTimeoutException) {
                 _error.value = "Network timeout. Please try again later. (By submit)"
                 Log.e("MainViewModel", "SocketTimeoutException: ${e.message}")
@@ -363,4 +369,3 @@ class MainViewModel(
         }
     }
 }
-

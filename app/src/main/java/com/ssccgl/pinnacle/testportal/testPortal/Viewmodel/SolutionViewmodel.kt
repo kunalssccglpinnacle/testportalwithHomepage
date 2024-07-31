@@ -137,4 +137,8 @@ class SolutionViewModel : ViewModel() {
         _currentQuestionId.value = nextQuestionId
         setSelectedOption(nextQuestionId)
     }
+
+    fun moveToQuestion(questionId: Int){
+        _currentQuestionId.value = questionId
+    }
 }
