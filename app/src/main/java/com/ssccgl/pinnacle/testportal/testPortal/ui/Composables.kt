@@ -5,6 +5,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,8 +13,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.RadioButton
@@ -29,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -164,4 +169,66 @@ fun formatTime(seconds: Long): String {
     val minutes = (seconds % 3600) / 60
     val tSecond = seconds % 60
     return String.format("%02d:%02d:%02d", hours, minutes, tSecond)
+}
+
+@Composable
+fun CustomButton(
+    text: String,
+    onClick: () -> Unit,
+    backgroundColor: Color,
+    textColor: Color,
+    borderColor: Color? = null,
+    width: Int = 120,
+    height: Int = 40,
+    fontSize: Int = 12 // Default font size
+) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier.size(width.dp, height.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = backgroundColor
+        ),
+        shape = RoundedCornerShape(4.dp),
+        border = borderColor?.let { BorderStroke(1.dp, it) }
+    ) {
+        Text(
+            text = text,
+            style = TextStyle(
+                color = textColor,
+                fontSize = fontSize.sp
+            )
+        )
+    }
+}
+
+
+@Composable
+fun OptionItem(
+    option: String,
+    optionValue: String,
+    selectedOption: String,
+    correct_answer: String,
+    onSelectOption: (String) -> Unit
+) {
+    val backgroundColor = when {
+        optionValue == correct_answer && optionValue == selectedOption -> Color.Green // Correct and selected
+        optionValue == selectedOption && optionValue != correct_answer -> Color.Red // Selected but incorrect
+        optionValue == correct_answer -> Color.Green.copy(alpha = 0.3f) // Correct but not selected
+        else -> Color.Transparent
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(backgroundColor)
+            .clickable { onSelectOption(optionValue) }
+            .padding(8.dp)
+    ) {
+        Text(
+            text = optionValue,
+            fontSize = 18.sp,
+            modifier = Modifier.padding(end = 8.dp)
+        )
+        HtmlText(html = option)
+    }
 }
