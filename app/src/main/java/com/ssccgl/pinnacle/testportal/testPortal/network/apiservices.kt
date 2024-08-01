@@ -166,7 +166,10 @@ data class SubmitRequest(
     val paper_code: String,
     val exam_mode_id: String,
     val test_series_id: String,
-    val rTem: String
+    val rTem: String,
+    val paper_id:  Int,
+    val SingleTm: String,
+    val subject: Int
 )
 
 data class SubmitResponse(
@@ -413,9 +416,9 @@ interface ApiService {
 object RetrofitInstance {
     val api: ApiService by lazy {
         Retrofit.Builder()
-            .baseUrl("http://3.111.199.93:5000/")
+//            .baseUrl("http://3.111.199.93:5000/")
 
-            //.baseUrl("https://onlineexam.ssccglpinnacle.com/")
+            .baseUrl("https://onlineexam.ssccglpinnacle.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)

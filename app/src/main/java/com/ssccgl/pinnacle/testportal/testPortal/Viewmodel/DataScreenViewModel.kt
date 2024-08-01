@@ -347,7 +347,11 @@ class MainViewModel(
                         paper_code = paperCode,
                         exam_mode_id = examModeId,
                         test_series_id = testSeriesId,
-                        rTem = formatTime(_remainingCountdown.value)
+                        rTem = formatTime(_remainingCountdown.value),
+                        paper_id = _currentQuestionId.toIntValue(),
+                        SingleTm = formatTime(_elapsedTime.value),
+                        subject = _data.value.flatMap { it.details }
+                            .find { it.qid == _currentQuestionId.value }?.subject_id ?: 0
                     )
                 )
                 // Navigation Handled
@@ -368,4 +372,9 @@ class MainViewModel(
             }
         }
     }
+
+    fun MutableStateFlow<Int>.toIntValue(): Int {
+        return this.value
+    }
+
 }
