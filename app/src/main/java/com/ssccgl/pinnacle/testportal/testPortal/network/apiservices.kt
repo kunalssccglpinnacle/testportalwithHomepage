@@ -1,9 +1,11 @@
 package com.ssccgl.pinnacle.testportal.network
 
+import com.google.gson.annotations.SerializedName
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Headers
 import retrofit2.http.POST
 
 data class TestPass(
@@ -372,9 +374,129 @@ data class Detailsol(
     val bookmark_ques: String
 )
 
+// login
+data class MobileOtpRequest(val mobileNumber: String)
+data class MobileOtpResponse(
+    val status: String,
+    val message: String,
+    val verification_id: VerificationId,
+    val data: Data
+)
+
+data class VerificationId(
+    val message: String,
+    val type: String
+)
+
+data class Data(
+    val _id: String,
+    val mobile_number: Long,
+    val __v: Int,
+    val verified_mobile_number: Boolean,
+    val email_id: String,
+    val full_name: String
+)
+
+data class OtpVerificationRequest(val otp: String, val mobileNumber: String)
+
+data class OtpVerificationResponse(
+    val status: String,
+    val message: String,
+    val data: Data?
+)
+
+data class EmailVerificationRequest(val email_id: String)
+
+data class EmailVerificationResponse(
+    val status: String,
+    val message: String
+)
+
+
+data class EmailVerificationAfterMobileRequest(val _id: String, val email_id: String, val fullName: String)
+
+
+
+data class ApiResponse(val status: String, val message: String, val data: Data)
+
+
+
+data class LoginRequest(
+    val email: String,
+    val password: String
+)
+
+
+data class MobileLoginRequest(
+    val mobileNumber: String,
+    val password: String
+)
+data class LoginResponse(
+    val status: String,
+    val message: String,
+    val token: String,
+    val data: LoginData
+)
+
+data class LoginData(
+    val _id: String,
+    val id: Int,
+    val full_name: String,
+    val email_id: String,
+    val mobile_number: String,
+    val role: String,
+    val goal: List<String>,
+    val createdAt: String,
+    val updatedAt: String,
+    @SerializedName("__v") val version: Int
+)
+
+
+
+
 
 
 interface ApiService {
+
+
+
+    @Headers("Content-Type: application/json")
+    @POST("api/v1/users/mobileVerification")
+    suspend fun sendOtp(@Body request: MobileOtpRequest): MobileOtpResponse
+
+    @Headers("Content-Type: application/json")
+    @POST("api/v1/users/mobileOtpVerificationReport")
+    suspend fun verifyOtp(@Body request: OtpVerificationRequest): OtpVerificationResponse
+
+
+    @Headers("Content-Type: application/json")
+    @POST("api/v1/users/emailVerification")
+    suspend fun sendEmailVerification(@Body request: EmailVerificationRequest): EmailVerificationResponse
+
+
+
+    @POST("api/v1/users/emailVerificationAfterMobile")
+    suspend fun emailVerificationAfterMobile(@Body request: EmailVerificationAfterMobileRequest): ApiResponse
+
+
+
+//    @Headers("Content-Type: application/json")
+//    @POST("api/v1/users/login")
+//    suspend fun login(@Body request: LoginRequest): LoginResponse
+
+
+    @Headers("Content-Type: application/json")
+    @POST("api/v1/users/login")
+    suspend fun loginWithEmail(@Body request: LoginRequest): LoginResponse
+
+    @Headers("Content-Type: application/json")
+    @POST("api/v1/users/login")
+    suspend fun loginWithMobile(@Body request: MobileLoginRequest): LoginResponse
+
+
+
+
+
     @GET("testpass")
     suspend fun getTestPasses(): List<TestPass>
 
@@ -413,9 +535,9 @@ interface ApiService {
 object RetrofitInstance {
     val api: ApiService by lazy {
         Retrofit.Builder()
-            .baseUrl("http://3.111.199.93:5000/")
+           // .baseUrl("http://3.111.199.93:5000/")
 
-            //.baseUrl("https://onlineexam.ssccglpinnacle.com/")
+            .baseUrl("https://onlineexam.ssccglpinnacle.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)
