@@ -168,7 +168,10 @@ data class SubmitRequest(
     val paper_code: String,
     val exam_mode_id: String,
     val test_series_id: String,
-    val rTem: String
+    val rTem: String,
+    val paper_id: Int,
+    val SingleTm: String,
+    val subject: Int
 )
 
 data class SubmitResponse(
