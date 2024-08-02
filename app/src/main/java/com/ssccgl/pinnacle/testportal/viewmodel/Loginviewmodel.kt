@@ -156,7 +156,6 @@
 //    }
 //}
 
-
 package com.ssccgl.pinnacle.testportal.viewmodel
 
 import android.util.Log
@@ -182,93 +181,12 @@ class LoginViewModel : ViewModel() {
     private val _loginState = MutableStateFlow(false)
     val loginState: StateFlow<Boolean> get() = _loginState
 
-    lateinit var mobileOtpResponseData: Data
+    private val _loginData = MutableStateFlow<LoginData?>(null)
+    val loginData: StateFlow<LoginData?> get() = _loginData
 
-    fun sendOtp(mobileNumber: String) {
-        viewModelScope.launch {
-            try {
-                Log.d("LoginViewModel", "Sending OTP to $mobileNumber")
-                val response: MobileOtpResponse = RetrofitInstance.api.sendOtp(MobileOtpRequest(mobileNumber))
-                Log.d("LoginViewModel", "OTP sent successfully: ${response.message}")
-                _apiResponseMessage.value = response.message
-                mobileOtpResponseData = response.data
-                _otpSentState.value = true
-            } catch (e: HttpException) {
-                Log.e("LoginViewModel", "HTTP exception: ${e.message()}")
-                _apiResponseMessage.value = "HTTP exception: ${e.message()}"
-                _otpSentState.value = false
-            } catch (e: Exception) {
-                Log.e("LoginViewModel", "Exception: ${e.message}")
-                _apiResponseMessage.value = "Exception: ${e.message}"
-                _otpSentState.value = false
-            }
-        }
-    }
 
-    fun verifyOtp(mobileNumber: String, otp: String) {
-        viewModelScope.launch {
-            try {
-                Log.d("LoginViewModel", "Verifying OTP for $mobileNumber")
-                val response: OtpVerificationResponse = RetrofitInstance.api.verifyOtp(OtpVerificationRequest(otp, mobileNumber))
-                Log.d("LoginViewModel", "OTP verification response: ${response.message}")
-                _apiResponseMessage.value = response.message
-                _otpVerifiedState.value = response.status == "success"
-                if (_otpVerifiedState.value) {
-                    _showEmailVerificationDialog.value = true
-                }
-            } catch (e: HttpException) {
-                Log.e("LoginViewModel", "HTTP exception: ${e.message()}")
-                _apiResponseMessage.value = "HTTP exception: ${e.message()}"
-                _otpVerifiedState.value = false
-            } catch (e: Exception) {
-                Log.e("LoginViewModel", "Exception: ${e.message}")
-                _apiResponseMessage.value = "Exception: ${e.message}"
-                _otpVerifiedState.value = false
-            }
-        }
-    }
-
-    fun sendEmailVerification(email: String) {
-        viewModelScope.launch {
-            try {
-                Log.d("LoginViewModel", "Sending email verification to $email")
-                val response: EmailVerificationResponse = RetrofitInstance.api.sendEmailVerification(EmailVerificationRequest(email))
-                Log.d("LoginViewModel", "Email verification sent successfully: ${response.message}")
-                _apiResponseMessage.value = response.message
-                _emailVerifiedState.value = response.status == "Success"
-            } catch (e: HttpException) {
-                Log.e("LoginViewModel", "HTTP exception: ${e.message()}")
-                _apiResponseMessage.value = "HTTP exception: ${e.message()}"
-                _emailVerifiedState.value = false
-            } catch (e: Exception) {
-                Log.e("LoginViewModel", "Exception: ${e.message}")
-                _apiResponseMessage.value = "Exception: ${e.message}"
-                _emailVerifiedState.value = false
-            }
-        }
-    }
-
-    fun verifyEmailAfterMobileVerification(_id: String, email: String, fullName: String) {
-        viewModelScope.launch {
-            try {
-                Log.d("LoginViewModel", "Verifying email after mobile verification")
-                val response = RetrofitInstance.api.emailVerificationAfterMobile(EmailVerificationAfterMobileRequest(_id, email, fullName))
-                Log.d("LoginViewModel", "Email verification response: ${response.message}")
-                _apiResponseMessage.value = response.message
-                _emailVerifiedState.value = response.status == "Success"
-                _showEmailVerificationDialog.value = false
-            } catch (e: HttpException) {
-                Log.e("LoginViewModel", "HTTP exception: ${e.message()}")
-                _apiResponseMessage.value = "HTTP exception: ${e.message()}"
-                _emailVerifiedState.value = false
-            } catch (e: Exception) {
-                Log.e("LoginViewModel", "Exception: ${e.message}")
-                _apiResponseMessage.value = "Exception: ${e.message}"
-                _emailVerifiedState.value = false
-            }
-        }
-    }
-
+    private val _mobileOtpResponseData = MutableStateFlow<Data?>(null)
+    val mobileOtpResponseData: StateFlow<Data?> get() = _mobileOtpResponseData
     fun login(emailOrMobile: String, password: String) {
         viewModelScope.launch {
             try {
@@ -281,6 +199,9 @@ class LoginViewModel : ViewModel() {
                 Log.d("LoginViewModel", "Login response: ${response.message}")
                 _apiResponseMessage.value = response.message
                 _loginState.value = response.status == "success"
+                if (_loginState.value) {
+                    _loginData.value = response.data
+                }
             } catch (e: HttpException) {
                 Log.e("LoginViewModel", "HTTP exception: ${e.message()}")
                 _apiResponseMessage.value = "HTTP exception: ${e.message()}"
@@ -293,8 +214,56 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    fun resetOtpSentState() {
-        _otpSentState.value = false
+    fun sendOtp(mobileNumber: String) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.sendOtp(MobileOtpRequest(mobileNumber))
+                _apiResponseMessage.value = response.message
+                _otpSentState.value = response.status == "success"
+            } catch (e: Exception) {
+                Log.e("LoginViewModel", "Exception: ${e.message}")
+                _apiResponseMessage.value = "Failed to send OTP: ${e.message}"
+            }
+        }
+    }
+
+    fun verifyOtp(mobileNumber: String, otp: String) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.verifyOtp(OtpVerificationRequest(otp, mobileNumber))
+                _apiResponseMessage.value = response.message
+                _otpVerifiedState.value = response.status == "success"
+            } catch (e: Exception) {
+                Log.e("LoginViewModel", "Exception: ${e.message}")
+                _apiResponseMessage.value = "Failed to verify OTP: ${e.message}"
+            }
+        }
+    }
+
+    fun sendEmailVerification(email: String) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.sendEmailVerification(EmailVerificationRequest(email))
+                _apiResponseMessage.value = response.message
+                _emailVerifiedState.value = response.status == "success"
+            } catch (e: Exception) {
+                Log.e("LoginViewModel", "Exception: ${e.message}")
+                _apiResponseMessage.value = "Failed to verify email: ${e.message}"
+            }
+        }
+    }
+
+    fun verifyEmailAfterMobileVerification(id: String, email: String, fullName: String) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.emailVerificationAfterMobile(EmailVerificationAfterMobileRequest(id, email, fullName))
+                _apiResponseMessage.value = response.message
+                _emailVerifiedState.value = response.status == "success"
+            } catch (e: Exception) {
+                Log.e("LoginViewModel", "Exception: ${e.message}")
+                _apiResponseMessage.value = "Failed to verify email after mobile verification: ${e.message}"
+            }
+        }
     }
 
     fun resetOtpVerifiedState() {

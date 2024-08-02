@@ -180,7 +180,6 @@
 //}
 
 
-
 package com.ssccgl.pinnacle.testportal.ui
 
 import androidx.compose.material.Text
@@ -191,6 +190,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
+import com.ssccgl.pinnacle.testportal.network.LoginData
 import com.ssccgl.pinnacle.testportal.network.RetrofitInstance
 import com.ssccgl.pinnacle.testportal.network.SolutionRequest
 import com.ssccgl.pinnacle.testportal.repository.TestRepository
@@ -199,7 +199,7 @@ import com.ssccgl.pinnacle.testportal.testPortal.Viewmodel.NewTestsWebViewModel
 import com.ssccgl.pinnacle.testportal.viewmodel.*
 
 @Composable
-fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewModel) {
+fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewModel, loginData: LoginData?) {
     val loginViewModel: LoginViewModel = viewModel()
     val testPortalViewModel: TestPortalViewModel = viewModel()
     val testPassViewModel: TestPassViewModel = viewModel()
@@ -211,14 +211,11 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
 
     NavHost(navController, startDestination = "login") {
         composable("login") { LoginScreen(navController, loginViewModel) }
-
-
-
         composable("home") { HomeScreen(homeViewModel) }
         composable("test_portal") { TestPortalScreen(navController, testPortalViewModel) }
         composable("product") { ProductScreen() }
         composable("my_courses") { MyCoursesScreen() }
-        composable("dashboard") { DashboardScreen(navController) }
+        composable("dashboard") { DashboardScreen(navController)}//, loginData?.full_name.orEmpty(), loginData?.email_id.orEmpty(), loginData?.mobile_number.orEmpty()) }
         composable("test_pass") { TestPassScreen(navController, testPassViewModel) }
         composable(
             route = "individual_exam_test_pass/{productId}",
@@ -239,7 +236,7 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
             val examId = backStackEntry.arguments?.getInt("examId") ?: 0
             val tierId = backStackEntry.arguments?.getInt("tierId") ?: 0
             NewTestsWebScreen(
-                emailId = "anshulji100@gmail.com",
+                emailId = "kunalsharma@ssccglpinnacle.com",
                 examPostId = examPostId.toString(),
                 examId = examId.toString(),
                 tierId = tierId.toString(),
@@ -290,7 +287,7 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
             val examModeId = backStackEntry.arguments?.getInt("examModeId") ?: 0
             val viewModelFactory = MainViewModelFactory(
                 paperCode,
-                "anshulji100@gmail.com",
+                "kunalsharma@ssccglpinnacle.com",
                 examModeId.toString(),
                 testSeriesId
             )

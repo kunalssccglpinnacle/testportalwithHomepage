@@ -1,4 +1,3 @@
-
 package com.ssccgl.pinnacle.testportal.ui
 
 import androidx.compose.foundation.Image
@@ -23,7 +22,13 @@ import com.ssccgl.pinnacle.testportal.R
 import kotlinx.coroutines.launch
 
 @Composable
-fun AppDrawer(navController: NavHostController, scaffoldState: ScaffoldState) {
+fun AppDrawer(
+    navController: NavHostController,
+    scaffoldState: ScaffoldState,
+    fullName: String,
+    emailId: String,
+    mobileNumber: String
+) {
     val coroutineScope = rememberCoroutineScope()
 
     Column(
@@ -44,17 +49,17 @@ fun AppDrawer(navController: NavHostController, scaffoldState: ScaffoldState) {
                     .clip(CircleShape)
             )
             Text(
-                text = "KUNAL",
+                text = fullName,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 modifier = Modifier.padding(top = 8.dp)
             )
             Text(
-                text = "9799******",
+                text = mobileNumber,
                 fontSize = 14.sp
             )
             Text(
-                text = "App version: 1.0",
+                text = emailId,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(top = 8.dp)
             )
