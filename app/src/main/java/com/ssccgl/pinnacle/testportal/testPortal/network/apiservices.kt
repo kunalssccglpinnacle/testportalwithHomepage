@@ -416,8 +416,13 @@ data class EmailVerificationResponse(
 )
 
 
-data class EmailVerificationAfterMobileRequest(val _id: String, val email_id: String, val fullName: String)
+//data class EmailVerificationAfterMobileRequest(val _id: String, val email_id: String, val fullName: String)
 
+data class EmailVerificationAfterMobileRequest(
+    val _id: String,
+    val email_id: String,
+    val fullName: String
+)
 
 
 data class ApiResponse(val status: String, val message: String, val data: Data)
