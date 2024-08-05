@@ -41,7 +41,7 @@ fun TestSeriesDetails2Screen(
     val testSeriesDetailsState by viewModel.testSeriesDetails.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.fetchTestSeriesDetails(testSeriesId)
+        viewModel.fetchTestSeriesDetails(testSeriesId,emailId)
     }
 
     Scaffold(

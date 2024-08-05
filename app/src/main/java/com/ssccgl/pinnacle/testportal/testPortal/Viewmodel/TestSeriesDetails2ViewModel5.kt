@@ -15,10 +15,10 @@ class TestSeriesDetails2ViewModel(private val repository: TestRepository) : View
     private val _testSeriesDetails = MutableStateFlow<TestSeriesDetails2Response?>(null)
     val testSeriesDetails: StateFlow<TestSeriesDetails2Response?> = _testSeriesDetails
 
-    fun fetchTestSeriesDetails(testSeriesId: String) {
+    fun fetchTestSeriesDetails(testSeriesId: String,emailId: String) {
         viewModelScope.launch {
             try {
-                val request = TestSeriesDetails2Request("harishmodi129@gmail.com", testSeriesId)
+                val request = TestSeriesDetails2Request(emailId , testSeriesId)
                 val response = repository.fetchTestSeriesDetails2(request)
                 _testSeriesDetails.value = response
             } catch (e: Exception) {
