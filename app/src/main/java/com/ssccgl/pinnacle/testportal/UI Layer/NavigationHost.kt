@@ -34,28 +34,40 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
         composable("test_portal") { TestPortalScreen(navController, testPortalViewModel) }
         composable("product") { ProductScreen() }
         composable("my_courses") { MyCoursesScreen() }
-        composable("dashboard") { DashboardScreen(navController)}//, loginData?.full_name.orEmpty(), loginData?.email_id.orEmpty(), loginData?.mobile_number.orEmpty()) }
-        composable("test_pass") { TestPassScreen(navController, testPassViewModel) }
+        composable("dashboard") { DashboardScreen(navController, loginData?.email_id ?: "") }
         composable(
-            route = "individual_exam_test_pass/{productId}",
-            arguments = listOf(navArgument("productId") { type = NavType.IntType })
+            route = "test_pass/{emailId}",
+            arguments = listOf(navArgument("emailId") { type = NavType.StringType })
         ) { backStackEntry ->
-            val productId = backStackEntry.arguments?.getInt("productId") ?: 0
-            IndividualExamTestPassScreen(productId = productId, viewModel = individualExamTestPassViewModel, navController = navController)
+            val emailId = backStackEntry.arguments?.getString("emailId") ?: ""
+            TestPassScreen(navController = navController, emailId = emailId, testPassViewModel = testPassViewModel)
         }
         composable(
-            route = "new_tests_web_screen/{examPostId}/{examId}/{tierId}",
+            route = "individual_exam_test_pass/{productId}/{emailId}",
+            arguments = listOf(
+                navArgument("productId") { type = NavType.IntType },
+                navArgument("emailId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val productId = backStackEntry.arguments?.getInt("productId") ?: 0
+            val emailId = backStackEntry.arguments?.getString("emailId") ?: ""
+            IndividualExamTestPassScreen(productId = productId, emailId = emailId, viewModel = individualExamTestPassViewModel, navController = navController)
+        }
+        composable(
+            route = "new_tests_web_screen/{examPostId}/{examId}/{tierId}/{emailId}",
             arguments = listOf(
                 navArgument("examPostId") { type = NavType.IntType },
                 navArgument("examId") { type = NavType.IntType },
-                navArgument("tierId") { type = NavType.IntType }
+                navArgument("tierId") { type = NavType.IntType },
+                navArgument("emailId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val examPostId = backStackEntry.arguments?.getInt("examPostId") ?: 0
             val examId = backStackEntry.arguments?.getInt("examId") ?: 0
             val tierId = backStackEntry.arguments?.getInt("tierId") ?: 0
+            val emailId = backStackEntry.arguments?.getString("emailId") ?: ""
             NewTestsWebScreen(
-                emailId = "kunalsharma@ssccglpinnacle.com",
+                emailId = emailId,
                 examPostId = examPostId.toString(),
                 examId = examId.toString(),
                 tierId = tierId.toString(),
@@ -82,31 +94,36 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
             )
         }
         composable(
-            route = "test_series_details2_screen/{testSeriesId}",
+            route = "test_series_details2_screen/{testSeriesId}/{emailId}",
             arguments = listOf(
-                navArgument("testSeriesId") { type = NavType.StringType }
+                navArgument("testSeriesId") { type = NavType.StringType },
+                navArgument("emailId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
+            val emailId = backStackEntry.arguments?.getString("emailId") ?: ""
             val testSeriesId = backStackEntry.arguments?.getString("testSeriesId") ?: ""
             TestSeriesDetails2Screen(
+                emailId = emailId,
                 testSeriesId = testSeriesId,
                 navController = navController
             )
         }
         composable(
-            route = "data_screen/{testSeriesId}/{paperCode}/{examModeId}",
+            route = "data_screen/{testSeriesId}/{paperCode}/{examModeId}/{emailId}",
             arguments = listOf(
                 navArgument("testSeriesId") { type = NavType.StringType },
                 navArgument("paperCode") { type = NavType.StringType },
-                navArgument("examModeId") { type = NavType.IntType }
+                navArgument("examModeId") { type = NavType.IntType },
+                navArgument("emailId") { type = androidx.navigation.NavType.StringType }
             )
         ) { backStackEntry ->
+            val emailId = backStackEntry.arguments?.getString("emailId") ?: ""
             val testSeriesId = backStackEntry.arguments?.getString("testSeriesId") ?: ""
             val paperCode = backStackEntry.arguments?.getString("paperCode") ?: ""
             val examModeId = backStackEntry.arguments?.getInt("examModeId") ?: 0
             val viewModelFactory = MainViewModelFactory(
                 paperCode,
-                "kunalsharma@ssccglpinnacle.com",
+                emailId = emailId,
                 examModeId.toString(),
                 testSeriesId
             )
@@ -115,6 +132,7 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
                 paperCode = paperCode,
                 examModeId = examModeId,
                 navController = navController,
+                emailId = emailId,
                 viewModel = viewModel(factory = viewModelFactory)
             )
         }
@@ -140,7 +158,7 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
             )
         }
         composable(
-            route = "instructions_screen/{testSeriesName}/{marks}/{time}/{testSeriesId}/{paperCode}/{examModeId}/{questions}",
+            route = "instructions_screen/{testSeriesName}/{marks}/{time}/{testSeriesId}/{paperCode}/{examModeId}/{questions}/{emailId}",
             arguments = listOf(
                 navArgument("testSeriesName") { type = NavType.StringType },
                 navArgument("marks") { type = NavType.StringType },
@@ -148,7 +166,8 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
                 navArgument("testSeriesId") { type = NavType.StringType },
                 navArgument("paperCode") { type = NavType.StringType },
                 navArgument("examModeId") { type = NavType.StringType },
-                navArgument("questions") { type = NavType.StringType }
+                navArgument("questions") { type = NavType.StringType },
+                navArgument("emailId") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val testSeriesName = backStackEntry.arguments?.getString("testSeriesName") ?: ""
@@ -157,8 +176,20 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
             val testSeriesId = backStackEntry.arguments?.getString("testSeriesId") ?: ""
             val paperCode = backStackEntry.arguments?.getString("paperCode") ?: ""
             val examModeId = backStackEntry.arguments?.getString("examModeId") ?: ""
+
             val questions = backStackEntry.arguments?.getString("questions") ?: ""
-            InstructionsScreen(navController, testSeriesName, marks, time, testSeriesId, paperCode, examModeId, questions)
+            val emailId = backStackEntry.arguments?.getString("emailId") ?: ""
+            InstructionsScreen(
+                navController = navController,
+                testSeriesName = testSeriesName,
+                marks = marks,
+                time = time,
+                testSeriesId = testSeriesId,
+                paperCode = paperCode,
+                examModeId = examModeId,
+                questions = questions,
+                emailId = emailId
+            )
         }
         composable(
             route = "solution_screen/{paperCode}/{emailId}/{examModeId}/{testSeriesId}",

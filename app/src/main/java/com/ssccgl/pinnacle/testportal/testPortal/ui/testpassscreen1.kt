@@ -1,3 +1,4 @@
+//
 //package com.ssccgl.pinnacle.testportal.ui
 //
 //import androidx.compose.foundation.background
@@ -6,6 +7,8 @@
 //import androidx.compose.foundation.lazy.items
 //import androidx.compose.foundation.shape.RoundedCornerShape
 //import androidx.compose.material.*
+//import androidx.compose.material.icons.Icons
+//import androidx.compose.material.icons.filled.ArrowBack
 //import androidx.compose.runtime.Composable
 //import androidx.compose.runtime.collectAsState
 //import androidx.compose.ui.Alignment
@@ -22,7 +25,6 @@
 //import androidx.navigation.compose.rememberNavController
 //import com.ssccgl.pinnacle.testportal.R
 //import com.ssccgl.pinnacle.testportal.network.TestPass
-////import com.ssccgl.pinnacle.testportal.testPortal.Viewmodel.TestPassViewModel
 //import com.ssccgl.pinnacle.testportal.viewmodel.TestPassViewModel
 //
 //@Composable
@@ -33,31 +35,44 @@
 //    val testPassesState = testPassViewModel.testPasses.collectAsState()
 //    val testPasses = testPassesState.value
 //
-//    LazyColumn(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(16.dp)
-//    ) {
-//        item {
-//            TestPassHeader()
-//            Spacer(modifier = Modifier.height(16.dp))
-//            Text(
-//                text = "Test Pass by Categories",
-//                fontWeight = FontWeight.Bold,
-//                fontSize = 24.sp,
-//                modifier = Modifier.padding(bottom = 16.dp)
+//    Scaffold(
+//        topBar = {
+//            TopAppBar(
+//                title = { Text("Test Pass") },
+//                navigationIcon = {
+//                    IconButton(onClick = { navController.navigateUp() }) {
+//                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+//                    }
+//                }
 //            )
-//        }
-//        if (testPasses.isEmpty()) {
+//        }) { paddingValues ->
+//        LazyColumn(
+//            contentPadding = paddingValues,
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(16.dp)
+//        ) {
 //            item {
-//                Text(text = "Loading..." )
-//            }
-//        } else {
-//            items(testPasses) { testPass ->
-//                TestPassCard(
-//                    testPass = testPass,
-//                    navController = navController
+//                TestPassHeader()
+//                Spacer(modifier = Modifier.height(16.dp))
+//                Text(
+//                    text = "Test Pass by Categories",
+//                    fontWeight = FontWeight.Bold,
+//                    fontSize = 24.sp,
+//                    modifier = Modifier.padding(bottom = 16.dp)
 //                )
+//            }
+//            if (testPasses.isEmpty()) {
+//                item {
+//                    Text(text = "Loading...")
+//                }
+//            } else {
+//                items(testPasses) { testPass ->
+//                    TestPassCard(
+//                        testPass = testPass,
+//                        navController = navController
+//                    )
+//                }
 //            }
 //        }
 //    }
@@ -174,8 +189,8 @@
 //            "Included Test series: ${testPass.totalTestSeries}",
 //            "Included all ssc Exams",
 //            "Full Mock Test based on Latest Pattern",
-//            "sectional based on different level",
-//            "chapterwise based on weightage",
+//            "Sectional based on different level",
+//            "Chapterwise based on weightage",
 //            "Previous Year Included"
 //        )
 //        features.forEach { feature ->
@@ -242,7 +257,7 @@
 //            },
 //            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF90CAF9))
 //        ) {
-//            Text(text = "show more")
+//            Text(text = "Show more")
 //        }
 //
 //        Button(
@@ -251,7 +266,7 @@
 //            },
 //            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray)
 //        ) {
-//            Text(text = "buy now")
+//            Text(text = "Buy now")
 //        }
 //    }
 //}
@@ -262,7 +277,6 @@
 //    val navController = rememberNavController()
 //    TestPassScreen(navController)
 //}
-
 package com.ssccgl.pinnacle.testportal.ui
 
 import androidx.compose.foundation.background
@@ -294,6 +308,7 @@ import com.ssccgl.pinnacle.testportal.viewmodel.TestPassViewModel
 @Composable
 fun TestPassScreen(
     navController: NavHostController,
+    emailId: String,
     testPassViewModel: TestPassViewModel = viewModel()
 ) {
     val testPassesState = testPassViewModel.testPasses.collectAsState()
@@ -317,7 +332,7 @@ fun TestPassScreen(
                 .padding(16.dp)
         ) {
             item {
-                TestPassHeader()
+                TestPassHeader(emailId)
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Test Pass by Categories",
@@ -334,7 +349,8 @@ fun TestPassScreen(
                 items(testPasses) { testPass ->
                     TestPassCard(
                         testPass = testPass,
-                        navController = navController
+                        navController = navController,
+                        emailId=emailId
                     )
                 }
             }
@@ -343,7 +359,7 @@ fun TestPassScreen(
 }
 
 @Composable
-fun TestPassHeader() {
+fun TestPassHeader(emailId: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -366,6 +382,12 @@ fun TestPassHeader() {
                 text = "One for all",
                 fontSize = 24.sp,
                 color = Color(0xFFFF5722),
+                textAlign = TextAlign.Start
+            )
+            Text(
+                text = "Email: $emailId",
+                fontSize = 16.sp,
+                color = Color.Black,
                 textAlign = TextAlign.Start
             )
         }
@@ -401,7 +423,7 @@ fun TestPassHeader() {
 
 @Composable
 fun TestPassCard(
-    testPass: TestPass,
+    testPass: TestPass,emailId: String,
     navController: NavHostController
 ) {
     Card(
@@ -439,7 +461,7 @@ fun TestPassCard(
             Spacer(modifier = Modifier.height(8.dp))
             PriceSection(testPass)
             Spacer(modifier = Modifier.height(8.dp))
-            ActionButtons(navController, testPass)
+            ActionButtons(navController, testPass,emailId)
         }
     }
 }
@@ -509,7 +531,7 @@ fun PriceSection(testPass: TestPass) {
 }
 
 @Composable
-fun ActionButtons(navController: NavHostController, testPass: TestPass) {
+fun ActionButtons(navController: NavHostController, testPass: TestPass,emailId: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -517,7 +539,7 @@ fun ActionButtons(navController: NavHostController, testPass: TestPass) {
     ) {
         Button(
             onClick = {
-                navController.navigate("individual_exam_test_pass/${testPass.id}")
+                navController.navigate("individual_exam_test_pass/${testPass.id}/${emailId}")
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF90CAF9))
         ) {
@@ -539,5 +561,5 @@ fun ActionButtons(navController: NavHostController, testPass: TestPass) {
 @Composable
 fun TestPassScreenPreview() {
     val navController = rememberNavController()
-    TestPassScreen(navController)
+    TestPassScreen(navController, "example@example.com")
 }

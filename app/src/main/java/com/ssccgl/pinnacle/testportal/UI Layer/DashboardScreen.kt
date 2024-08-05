@@ -241,7 +241,7 @@ fun DashboardIcon(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun DashboardScreen(navController: NavHostController) {
+fun DashboardScreen(navController: NavHostController, emailId: String) {
     val icons = listOf(
         Icons.Default.Assessment to "Test Portal",
         Icons.Default.Dashboard to "Dashboard",
@@ -277,7 +277,7 @@ fun DashboardScreen(navController: NavHostController) {
 
     val onClickHandlers = listOf(
         // { navController.navigate("test_portal") },
-        {navController.navigate("test_pass")},
+        {navController.navigate("test_pass/${emailId}")},
         { navController.navigate("dashboard") },
         { navController.navigate("product") },
         { navController.navigate("my_courses") },
@@ -313,12 +313,12 @@ fun DashboardScreen(navController: NavHostController) {
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun DashboardScreenPreview() {
-    val navController = rememberNavController()
-    MaterialTheme {
-        DashboardScreen(navController)
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun DashboardScreenPreview() {
+//    val navController = rememberNavController()
+//    MaterialTheme {
+//        DashboardScreen(navController,emailId)
+//    }
+//}
 

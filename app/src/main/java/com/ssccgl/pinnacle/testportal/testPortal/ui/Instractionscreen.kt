@@ -26,7 +26,7 @@ fun InstructionsScreen(
     testSeriesId: String,
     paperCode: String,
     examModeId: String,
-    questions: String
+    questions: String, emailId:String
 ) {
     val selectedLanguage = remember { mutableStateOf("Select") }
     val languages = listOf("Select", "Hindi", "English")
@@ -109,7 +109,7 @@ fun InstructionsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = {
                     if (selectedLanguage.value != "Select" && checked) {
-                        navController.navigate("data_screen/$testSeriesId/$paperCode/$examModeId")
+                        navController.navigate("data_screen/$testSeriesId/$paperCode/$examModeId/$emailId")
                     } else {
                         showError = true
                     }

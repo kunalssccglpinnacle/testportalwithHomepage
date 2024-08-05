@@ -29,9 +29,11 @@ import com.ssccgl.pinnacle.testportal.viewmodel.TestSeriesDetails2ViewModelFacto
 
 @Composable
 fun TestSeriesDetails2Screen(
+    emailId: String,
     testSeriesId: String,
     navController: NavHostController
 ) {
+
     val testRepository = TestRepository(RetrofitInstance.api)
     val testSeriesDetails2ViewModelFactory = TestSeriesDetails2ViewModelFactory(testRepository)
     val viewModel: TestSeriesDetails2ViewModel = viewModel(factory = testSeriesDetails2ViewModelFactory)
@@ -58,7 +60,7 @@ fun TestSeriesDetails2Screen(
             if (testSeriesDetailsState != null) {
                 LazyColumn(modifier = Modifier.padding(16.dp)) {
                     items(testSeriesDetailsState?.ar ?: emptyList()) { test ->
-                        TestDetailsCard(test, navController)
+                        TestDetailsCard(test, navController,emailId)
                     }
                 }
             } else {
@@ -69,83 +71,10 @@ fun TestSeriesDetails2Screen(
 }
 
 
-//@Composable
-//fun TestDetailsCard(test: AR, navController: NavController) {
-//    Card(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(8.dp),
-//        elevation = 4.dp,
-//        backgroundColor = Color(0xFFD6EAF8)
-//    ) {
-//        Column(modifier = Modifier.padding(16.dp)) {
-//            Row(verticalAlignment = Alignment.CenterVertically) {
-//                Text(
-//                    text = test.Title,
-//                    fontWeight = FontWeight.Bold,
-//                    fontSize = 18.sp,
-//                    color = Color.Black
-//                )
-//                Spacer(modifier = Modifier.weight(1f))
-////
-//            }
-//
-//            OutlinedButton(
-//                onClick = {
-//                    navController.navigate("instructions_screen")
-//                },
-////                onClick = {
-////                    navController.navigate("data_screen/${test.test_series_id}/${test.paper_code}/${test.exam_mode_id}")
-////                },
-//                border = BorderStroke(1.dp, Color(0xFF8E44AD)),
-//                colors = ButtonDefaults.outlinedButtonColors(
-//                    backgroundColor = Color.Transparent,
-//                    contentColor = Color(0xFF8E44AD)
-//                ),
-//                modifier = Modifier.height(30.dp)
-//            ) {
-//                Text(
-//                    text = "Attempt",
-//                    color = Color(0xFF8E44AD),
-//                    fontSize = 12.sp
-//                )
-//            }
-//
-//
-//
-//
-//            Spacer(modifier = Modifier.height(8.dp))
-//            Row(verticalAlignment = Alignment.CenterVertically) {
-//                InfoIconWithText(iconId = R.drawable.ic_quemark, text = test.Questions.toString())
-//                Spacer(modifier = Modifier.width(16.dp))
-//                InfoIconWithText(iconId = R.drawable.img, text = test.Marks.toString())
-//                Spacer(modifier = Modifier.width(16.dp))
-//                InfoIconWithText(iconId = R.drawable.ic_time, text = test.Time.toString())
-//            }
-//            Spacer(modifier = Modifier.height(8.dp))
-//            Row(verticalAlignment = Alignment.CenterVertically) {
-//                Text(
-//                    text = "Syllabus | ${test.languages}",
-//                    fontSize = 14.sp,
-//                    color = Color.White,
-//                    modifier = Modifier
-//                        .background(Color(0xFF0D47A1))
-//                        .padding(horizontal = 8.dp, vertical = 4.dp)
-//                )
-//                Spacer(modifier = Modifier.weight(1f))
-//                Text(
-//                    text = if (test.free_status == "1") "Free Mock" else "(${test.start_date} ${test.start_time})",
-//                    color = if (test.free_status == "1") Color.Red else Color.Black,
-//                    fontSize = 14.sp
-//                )
-//            }
-//        }
-//    }
-//}
 
 
 @Composable
-fun TestDetailsCard(test: AR, navController: NavController) {
+fun TestDetailsCard(test: AR, navController: NavController,emailId:String) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -153,6 +82,8 @@ fun TestDetailsCard(test: AR, navController: NavController) {
         elevation = 4.dp,
         backgroundColor = Color(0xFFD6EAF8)
     ) {
+
+
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -167,7 +98,7 @@ fun TestDetailsCard(test: AR, navController: NavController) {
             OutlinedButton(
                 onClick = {
 
-                    navController.navigate("instructions_screen/${test.Title}/${test.Marks}/${test.Time}/${test.test_series_id}/${test.paper_code}/${test.exam_mode_id}/${test.Questions}")
+                    navController.navigate("instructions_screen/${test.Title}/${test.Marks}/${test.Time}/${test.test_series_id}/${test.paper_code}/${test.exam_mode_id}/${test.Questions}/${emailId}")
                 },
                 border = BorderStroke(1.dp, Color(0xFF8E44AD)),
                 colors = ButtonDefaults.outlinedButtonColors(
