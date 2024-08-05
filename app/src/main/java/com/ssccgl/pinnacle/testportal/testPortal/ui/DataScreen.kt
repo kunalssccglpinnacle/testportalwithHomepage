@@ -1,5 +1,6 @@
 package com.ssccgl.pinnacle.testportal.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -18,10 +19,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.ssccgl.pinnacle.testportal.network.PauseTestRequest
 
 import com.ssccgl.pinnacle.testportal.viewmodel.MainViewModel
 import kotlin.math.abs
@@ -71,7 +74,49 @@ fun DataScreen(
     var showDialog by remember { mutableStateOf(false) }
 
     var swipeTriggered by remember { mutableStateOf(false) }
+    var showPauseDialog by remember { mutableStateOf(false) }
 
+    BackHandler {
+        showPauseDialog = true
+    }
+
+
+//    LaunchedEffect(Pair(isDataDisplayed, currentQuestionId)) {
+//        if (isDataDisplayed) {
+//            val currentQuestion = details.find { it.qid == currentQuestionId }
+//            if (currentQuestion != null) {
+//                viewModel.saveCurrentQuestionState(currentQuestionId, selectedOption, elapsedTime)
+//                viewModel.initializeElapsedTime(currentQuestionId)
+//                viewModel.setSelectedOption(currentQuestionId)
+//            }
+//        }
+//    }
+//
+//    LaunchedEffect(currentQuestionId, isDataDisplayed) {
+//        if (isDataDisplayed) {
+//            while (true) {
+//                viewModel.updateElapsedTime(currentQuestionId)
+//                delay(1000L)
+//            }
+//        }
+//    }
+//
+//    LaunchedEffect(isDataDisplayed) {
+//        if (isDataDisplayed && !countdownStarted) {
+//            viewModel.startCountdown(navController)
+//        }
+//    }
+//
+//    LaunchedEffect(isDataDisplayed) {
+//        if (isDataDisplayed) {
+//            if (currentQuestionId == 1 && details.isNotEmpty()) {
+//                viewModel.moveToQuestion(details.first().qid)
+//            }
+//            if (!countdownStarted) {
+//                viewModel.startCountdown(navController)
+//            }
+//        }
+//    }
 
     LaunchedEffect(Pair(isDataDisplayed, currentQuestionId)) {
         if (isDataDisplayed) {
@@ -80,6 +125,11 @@ fun DataScreen(
                 viewModel.saveCurrentQuestionState(currentQuestionId, selectedOption, elapsedTime)
                 viewModel.initializeElapsedTime(currentQuestionId)
                 viewModel.setSelectedOption(currentQuestionId)
+
+                // Start countdown if not already started
+                if (!countdownStarted) {
+                    viewModel.startCountdown(navController)
+                }
             }
         }
     }
@@ -89,23 +139,6 @@ fun DataScreen(
             while (true) {
                 viewModel.updateElapsedTime(currentQuestionId)
                 delay(1000L)
-            }
-        }
-    }
-
-    LaunchedEffect(isDataDisplayed) {
-        if (isDataDisplayed && !countdownStarted) {
-            viewModel.startCountdown()
-        }
-    }
-
-    LaunchedEffect(isDataDisplayed) {
-        if (isDataDisplayed) {
-            if (currentQuestionId == 1 && details.isNotEmpty()) {
-                viewModel.moveToQuestion(details.first().qid)
-            }
-            if (!countdownStarted) {
-                viewModel.startCountdown()
             }
         }
     }
@@ -279,6 +312,11 @@ fun DataScreen(
                                 coroutineScope.launch { drawerState.open() }
                             }) {
                                 Icon(imageVector = Icons.Default.Menu, contentDescription = "Open Drawer")
+                            }
+                            IconButton(onClick = {
+                                showPauseDialog = true
+                            }) {
+                                Icon(imageVector = Icons.Default.Pause, contentDescription = "Pause Test")
                             }
                         },
                     )
@@ -493,6 +531,57 @@ fun DataScreen(
                         Text("Marked for Review and Answered: ${it.marked_answered_count}")
                         Text("Not Visited: ${it.not_visited}")
                     }
+                }
+            }
+        )
+    }
+
+    if (showPauseDialog) {
+        AlertDialog(
+            onDismissRequest = { showPauseDialog = false },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        coroutineScope.launch{
+                            viewModel.pauseTest(
+                                pauseRequest = PauseTestRequest(
+                                    email_id = emailId,
+                                    paper_code = paperCode,
+                                    exam_mode_id = examModeId.toString(),
+                                    test_series_id = testSeriesId,
+                                    rTem = formatTime(remainingCountdown),
+                                    pause_question = currentQuestionId
+                                )
+                            )
+                            viewModel.saveAnswer(
+                                paperId = currentQuestionId,
+                                option = viewModel.validateOption(selectedOption),
+                                subject = details.find {it.qid == currentQuestionId}?.subject_id ?: 0,
+                                currentPaperId = currentQuestionId,
+                                remainingTime = formatTime(remainingCountdown),
+                                singleTm = formatTime(elapsedTime),
+                                saveType = "nxt",
+                                answerStatus = if(isMarkedForReview) "4" else "1"
+                            )
+                        }
+                        showPauseDialog = false
+                    }
+                ) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showPauseDialog = false }
+                ) {
+                    Text("No")
+                }
+            },
+            text = {
+                Column {
+                    Text("Do you want to pause the test?")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Current Question: $currentQuestionId")
                 }
             }
         )
