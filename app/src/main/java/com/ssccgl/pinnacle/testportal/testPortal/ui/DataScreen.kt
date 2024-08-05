@@ -197,6 +197,9 @@ fun DataScreen(
                         Text("Not Visited: ${it.not_visited}")
                     }
                     Spacer(modifier = Modifier.height(16.dp))
+                    Text("Test Series Id: $testSeriesId")
+                    Text("Paper Code: $paperCode")
+                    Text("Exam Mode Id: ${ examModeId.toString() }")
                 }
 
                 if (drawerState.isOpen) {

@@ -6,6 +6,8 @@ import androidx.navigation.NavHostController
 import com.ssccgl.pinnacle.testportal.network.IndexResponse
 import com.ssccgl.pinnacle.testportal.network.FetchDataRequest
 import com.ssccgl.pinnacle.testportal.network.PaperCodeDetailsResponse
+import com.ssccgl.pinnacle.testportal.network.PauseTestRequest
+import com.ssccgl.pinnacle.testportal.network.PauseTestResponse
 import com.ssccgl.pinnacle.testportal.network.RetrofitInstance
 import com.ssccgl.pinnacle.testportal.network.SaveAnswerRequest
 import com.ssccgl.pinnacle.testportal.network.SaveAnswerResponse
@@ -72,6 +74,9 @@ class MainViewModel(
     private val _markedForReviewMap = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
     val markedForReviewMap: LiveData<Map<Int, Boolean>> = _markedForReviewMap.asLiveData()
 
+    private val _pauseTestResponse = MutableStateFlow<PauseTestResponse?>(null)
+    val pauseTestResponse: LiveData<PauseTestResponse?> = _pauseTestResponse.asLiveData()
+
     val selectedOptions = mutableMapOf<Int, String>()
     val elapsedTimeMap = mutableMapOf<Int, Long>()
     val startTimeMap = mutableMapOf<Int, Long>()
@@ -110,14 +115,48 @@ class MainViewModel(
                 _markedForReviewMap.value = initialMarkedForReviewMap
 
                 // Ensure the first question ID is set correctly
-                if (response.isNotEmpty() && response[0].details.isNotEmpty()) {
-                    _currentQuestionId.value = response[0].details[0].qid
-                    setSelectedOption(response[0].details[0].qid)
-                    initializeElapsedTime(response[0].details[0].qid) // Initialize elapsed time for the first question
-                }
+//                if (response.isNotEmpty() && response[0].details.isNotEmpty()) {
+//                    _currentQuestionId.value = response[0].details[0].qid
+//                    setSelectedOption(response[0].details[0].qid)
+//                    initializeElapsedTime(response[0].details[0].qid) // Initialize elapsed time for the first question
+//                }
                 _error.value = null
 
                 fetchPaperCodeDetails()
+                fetchPausedQuestion() // Fetch the paused question after data is loaded
+
+            } catch (e: Exception) {
+                _error.value = e.message
+            }
+        }
+    }
+
+    fun pauseTest(pauseRequest: PauseTestRequest) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.pauseTest(pauseRequest)
+                _pauseTestResponse.value = response
+                _error.value = null
+            } catch (e: Exception) {
+                _error.value = e.message
+            }
+        }
+    }
+
+    fun fetchPausedQuestion() {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.getPausedQuestion(
+                    FetchDataRequest(
+                        paper_code = paperCode,
+                        email_id = emailId,
+                        exam_mode_id = examModeId,
+                        test_series_id = testSeriesId
+                    )
+                )
+                val pauseQuestionId = response.pause_question
+                moveToQuestion(pauseQuestionId) // Move to the paused question
+
             } catch (e: Exception) {
                 _error.value = e.message
             }
@@ -184,13 +223,16 @@ class MainViewModel(
         _displayElapsedTime.value = formatTime(_elapsedTime.value)
     }
 
-    fun startCountdown() {
+    fun startCountdown(navController: NavHostController) {
         viewModelScope.launch {
             _countdownStarted.value = true
             while (_remainingCountdown.value > 0) {
                 delay(1000L)
                 _remainingCountdown.value--
                 _displayCountdownTime.value = formatTime(_remainingCountdown.value)
+            }
+            if (_remainingCountdown.value == 0L) {
+                submit(navController) // Call submit function when countdown reaches zero
             }
         }
     }

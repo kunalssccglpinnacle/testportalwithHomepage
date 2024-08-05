@@ -454,14 +454,38 @@ data class LoginData(
     @SerializedName("__v") val version: Int
 )
 
+data class PauseTestRequest(
+    val email_id: String,
+    val paper_code: String,
+    val exam_mode_id: String,
+    val test_series_id: String,
+    val rTem: String,
+    val pause_question: Int
+)
+
+data class PauseTestResponse(
+    val _id: String,
+    val id: Int,
+    val email_id: String,
+    val exam_mode_id: Int,
+    val test_series_id: Int,
+    val paper_code: String,
+    val status: Int,
+    val remaining_time: String,
+    val pause_question: Int
+)
+
+
+// To resume test
+data class PauseQuestionResponse(
+    val pause_question: Int
+)
 
 
 
 
 
 interface ApiService {
-
-
 
     @Headers("Content-Type: application/json")
     @POST("api/v1/users/mobileVerification")
@@ -471,12 +495,9 @@ interface ApiService {
     @POST("api/v1/users/mobileOtpVerificationReport")
     suspend fun verifyOtp(@Body request: OtpVerificationRequest): OtpVerificationResponse
 
-
     @Headers("Content-Type: application/json")
     @POST("api/v1/users/emailVerification")
     suspend fun sendEmailVerification(@Body request: EmailVerificationRequest): EmailVerificationResponse
-
-
 
     @POST("api/v1/users/emailVerificationAfterMobile")
     suspend fun emailVerificationAfterMobile(@Body request: EmailVerificationAfterMobileRequest): ApiResponse
@@ -532,6 +553,12 @@ interface ApiService {
 
     @POST("solution")
     suspend fun fetchSolutionData(@Body request: SolutionRequest): List<SolutionResponse>
+
+    @POST("/pauseTest")
+    suspend fun pauseTest(@Body request: PauseTestRequest): PauseTestResponse
+
+    @POST("/pauseQuestion")
+    suspend fun getPausedQuestion(@Body request: FetchDataRequest): PauseQuestionResponse
 
 }
 
