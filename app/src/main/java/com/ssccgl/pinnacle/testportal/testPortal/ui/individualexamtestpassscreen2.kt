@@ -26,6 +26,7 @@ import com.ssccgl.pinnacle.testportal.testPortal.Viewmodel.IndividualExamTestPas
 @Composable
 fun IndividualExamTestPassScreen(
     productId: Int,
+    emailId:String,
     viewModel: IndividualExamTestPassViewModel2 = viewModel(),
     navController: NavHostController
 ) {
@@ -48,7 +49,10 @@ fun IndividualExamTestPassScreen(
     ) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
 
-            TestPassHeader()
+            TestPassHeader(emailId)
+
+
+
             Text(
                 text = "Individual Exam Test Passes",
                 fontWeight = FontWeight.Bold,
@@ -70,7 +74,7 @@ fun IndividualExamTestPassScreen(
 
             LazyColumn {
                 items(examTestPasses) { examTestPass ->
-                    StyledCard(examTestPass, navController)
+                    StyledCard(examTestPass, navController,emailId)
                 }
             }
         }
@@ -79,7 +83,7 @@ fun IndividualExamTestPassScreen(
 }
 
 @Composable
-fun StyledCard(examTestPass: IndividualExamTestPass, navController: NavHostController) {
+fun StyledCard(examTestPass: IndividualExamTestPass, navController: NavHostController,emailId: String) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -113,7 +117,7 @@ fun StyledCard(examTestPass: IndividualExamTestPass, navController: NavHostContr
             )
             FeatureList(examTestPass)
             Spacer(modifier = Modifier.height(8.dp))
-            ActionButtons(navController, examTestPass)
+            ActionButtons(navController, examTestPass, emailId )
         }
     }
 }
@@ -150,7 +154,7 @@ fun FeatureList(examTestPass: IndividualExamTestPass) {
 }
 
 @Composable
-fun ActionButtons(navController: NavHostController, examTestPass: IndividualExamTestPass) {
+fun ActionButtons(navController: NavHostController, examTestPass: IndividualExamTestPass,emailId: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -158,12 +162,7 @@ fun ActionButtons(navController: NavHostController, examTestPass: IndividualExam
     ) {
         Button(
             onClick = {
-                navController.navigate(
-                    "new_tests_web_screen/" +
-                            "${examTestPass.exam_post_id}/" +
-                            "${examTestPass.exam_id}/" +
-                            "${examTestPass.id}"
-                )
+                navController.navigate("new_tests_web_screen/${examTestPass.exam_post_id}/${examTestPass.exam_id}/${examTestPass.id}/$emailId")
             },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF90CAF9))
         ) {

@@ -19,6 +19,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 
 import com.ssccgl.pinnacle.testportal.viewmodel.MainViewModel
@@ -28,6 +30,7 @@ import kotlin.math.abs
 @Composable
 fun DataScreen(
     testSeriesId: String,
+    emailId: String,
     paperCode: String,
     examModeId: Int,
     navController: NavHostController,
@@ -278,6 +281,14 @@ fun DataScreen(
                                 Icon(imageVector = Icons.Default.Menu, contentDescription = "Open Drawer")
                             }
                         },
+                    )
+
+                    androidx.compose.material.Text(
+                        text = "Email: $emailId",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = Color.Black,
+                        modifier = Modifier.padding(16.dp)
                     )
                 },
                 bottomBar = {

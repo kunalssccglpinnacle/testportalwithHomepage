@@ -43,7 +43,7 @@ class TestPortalActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             val homeViewModel: HomeViewModel = viewModel()
-            NavigationHost(navController = navController, homeViewModel = homeViewModel)
+            NavigationHost(navController = navController, homeViewModel = homeViewModel, loginData = null)
         }
     }
 }

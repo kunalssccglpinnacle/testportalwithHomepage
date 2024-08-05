@@ -1,3 +1,171 @@
+//package com.ssccgl.pinnacle.testportal.ui
+//
+//import androidx.compose.foundation.background
+//import androidx.compose.foundation.clickable
+//import androidx.compose.foundation.layout.*
+//import androidx.compose.foundation.lazy.grid.GridCells
+//import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+//import androidx.compose.foundation.shape.CircleShape
+//import androidx.compose.material.*
+//import androidx.compose.material.icons.Icons
+//import androidx.compose.material.icons.filled.*
+//import androidx.compose.runtime.Composable
+//import androidx.compose.ui.Alignment
+//import androidx.compose.ui.Modifier
+//import androidx.compose.ui.graphics.Color
+//import androidx.compose.ui.text.font.FontWeight
+//import androidx.compose.ui.unit.dp
+//import androidx.compose.ui.unit.sp
+//import androidx.navigation.NavHostController
+//
+//@Composable
+//fun DashboardScreen(navController: NavHostController, fullName: String, emailId: String, mobileNumber: String) {
+//    Scaffold(
+////        topBar = {
+////            TopAppBar(
+////                title = { Text(text = "Dashboard") },
+////                backgroundColor = MaterialTheme.colors.primary
+////            )
+////        },
+//        content = { padding ->
+//            Column(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(padding)
+//                    .padding(16.dp)
+//            ) {
+//               // UserInfoSection(fullName, emailId, mobileNumber)
+//                DashboardGrid(navController)
+//            }
+//        }
+//    )
+//}
+//
+//@Composable
+//fun UserInfoSection(fullName: String, emailId: String, mobileNumber: String) {
+//    Column(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(bottom = 16.dp)
+//    ) {
+//        Text(
+//            text = "Welcome, $fullName",
+//            style = MaterialTheme.typography.h6,
+//            fontSize = 24.sp,
+//            fontWeight = FontWeight.Bold
+//        )
+//        Text(
+//            text = "Email: $emailId",
+//            style = MaterialTheme.typography.body1,
+//            fontSize = 18.sp,
+//            modifier = Modifier.padding(bottom = 8.dp)
+//        )
+//        Text(
+//            text = "Mobile: $mobileNumber",
+//            style = MaterialTheme.typography.body1,
+//            fontSize = 18.sp,
+//            modifier = Modifier.padding(bottom = 8.dp)
+//        )
+//    }
+//}
+//
+//@Composable
+//fun DashboardGrid(navController: NavHostController) {
+//    val icons = listOf(
+//        Icons.Default.Assessment to "Test Portal",
+//        Icons.Default.Dashboard to "Dashboard",
+//        Icons.Default.ShoppingCart to "Product",
+//        Icons.Default.School to "My Courses",
+//        Icons.Default.Book to "Books",
+//        Icons.Default.CheckCircle to "Attempted Tests",
+//        Icons.Default.TrackChanges to "Tracking",
+//        Icons.Default.LibraryBooks to "eBooks",
+//        Icons.Default.Save to "Saved",
+//        Icons.Default.OfflinePin to "Offline eBooks",
+//        Icons.Default.QrCodeScanner to "QR Scanner",
+//        Icons.Default.Keyboard to "Typing Software",
+//        Icons.Default.VideoLibrary to "Offline Videos"
+//    )
+//
+//    val colors = listOf(
+//        Color(0xFF9C27B0),
+//        Color(0xFF03A9F4),
+//        Color(0xFFFFC107),
+//        Color(0xFFF44336),
+//        Color(0xFF3F51B5),
+//        Color(0xFF4CAF50),
+//        Color(0xFFFF5722),
+//        Color(0xFF673AB7),
+//        Color(0xFF009688),
+//        Color(0xFF795548),
+//        Color(0xFF607D8B),
+//        Color(0xFFFF9800),
+//        Color(0xFFE91E63),
+//        Color(0xFF2196F3)
+//    )
+//
+//    val onClickHandlers = listOf(
+//        { navController.navigate("test_portal") },
+//        { navController.navigate("dashboard") },
+//        { navController.navigate("product") },
+//        { navController.navigate("my_courses") },
+//        { /* Handle click for Books */ },
+//        { /* Handle click for Attempted Tests */ },
+//        { /* Handle click for Tracking */ },
+//        { /* Handle click for eBooks */ },
+//        { /* Handle click for Saved */ },
+//        { /* Handle click for Offline eBooks */ },
+//        { /* Handle click for QR Scanner */ },
+//        { /* Handle click for Typing Software */ },
+//        { /* Handle click for Offline Videos */ }
+//    )
+//
+//    LazyVerticalGrid(
+//        columns = GridCells.Fixed(3),
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .padding(16.dp),
+//        verticalArrangement = Arrangement.spacedBy(16.dp),
+//        horizontalArrangement = Arrangement.spacedBy(16.dp)
+//    ) {
+//        items(icons.size) { index ->
+//            DashboardIcon(
+//                icon = { Icon(icons[index].first, contentDescription = icons[index].second, tint = Color.White) },
+//                label = icons[index].second,
+//                backgroundColor = colors[index],
+//                onClick = onClickHandlers[index]
+//            )
+//        }
+//    }
+//}
+//
+//@Composable
+//fun DashboardIcon(icon: @Composable () -> Unit, label: String, backgroundColor: Color, onClick: () -> Unit) {
+//    Column(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .clickable(onClick = onClick)
+//            .padding(8.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        Box(
+//            modifier = Modifier
+//                .size(64.dp)
+//                .background(backgroundColor, shape = CircleShape),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            icon()
+//        }
+//        Spacer(modifier = Modifier.height(8.dp))
+//        Text(
+//            text = label,
+//            fontSize = 16.sp,
+//            modifier = Modifier.weight(1f)
+//        )
+//    }
+//}
+
+
 package com.ssccgl.pinnacle.testportal.ui
 
 import androidx.compose.foundation.background
@@ -73,7 +241,7 @@ fun DashboardIcon(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun DashboardScreen(navController: NavHostController) {
+fun DashboardScreen(navController: NavHostController, emailId: String) {
     val icons = listOf(
         Icons.Default.Assessment to "Test Portal",
         Icons.Default.Dashboard to "Dashboard",
@@ -108,8 +276,8 @@ fun DashboardScreen(navController: NavHostController) {
     )
 
     val onClickHandlers = listOf(
-       // { navController.navigate("test_portal") },
-        {navController.navigate("test_pass")},
+        // { navController.navigate("test_portal") },
+        {navController.navigate("test_pass/${emailId}")},
         { navController.navigate("dashboard") },
         { navController.navigate("product") },
         { navController.navigate("my_courses") },
@@ -145,13 +313,12 @@ fun DashboardScreen(navController: NavHostController) {
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun DashboardScreenPreview() {
-    val navController = rememberNavController()
-    MaterialTheme {
-        DashboardScreen(navController)
-    }
-}
-
+//@Preview(showBackground = true)
+//@Composable
+//fun DashboardScreenPreview() {
+//    val navController = rememberNavController()
+//    MaterialTheme {
+//        DashboardScreen(navController,emailId)
+//    }
+//}
 
