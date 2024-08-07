@@ -1,3 +1,4 @@
+
 package com.ssccgl.pinnacle.testportal.ui
 
 import androidx.compose.foundation.BorderStroke
@@ -22,7 +23,7 @@ import androidx.navigation.NavHostController
 import com.ssccgl.pinnacle.testportal.R
 import com.ssccgl.pinnacle.testportal.network.AR
 import com.ssccgl.pinnacle.testportal.network.RetrofitInstance
-import com.ssccgl.pinnacle.testportal.network.TestSeriesDetails2Response
+import com.ssccgl.pinnacle.testportal.network.TestSeriesAccessRequest
 import com.ssccgl.pinnacle.testportal.repository.TestRepository
 import com.ssccgl.pinnacle.testportal.viewmodel.TestSeriesDetails2ViewModel
 import com.ssccgl.pinnacle.testportal.viewmodel.TestSeriesDetails2ViewModelFactory
@@ -30,24 +31,30 @@ import com.ssccgl.pinnacle.testportal.viewmodel.TestSeriesDetails2ViewModelFacto
 @Composable
 fun TestSeriesDetails2Screen(
     emailId: String,
+    examId: Int,
+    examPostId: Int,
+    tierId: String,
+    productId: Int,
     testSeriesId: String,
+    examModeId: Int,
     navController: NavHostController
 ) {
-
     val testRepository = TestRepository(RetrofitInstance.api)
     val testSeriesDetails2ViewModelFactory = TestSeriesDetails2ViewModelFactory(testRepository)
     val viewModel: TestSeriesDetails2ViewModel = viewModel(factory = testSeriesDetails2ViewModelFactory)
 
     val testSeriesDetailsState by viewModel.testSeriesDetails.collectAsState()
+    val userStatus by viewModel.userStatus.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.fetchTestSeriesDetails(testSeriesId)
+        viewModel.fetchTestSeriesDetails(testSeriesId, emailId)
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Back") },
+                title = { Text("Test Series Details") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
@@ -56,11 +63,18 @@ fun TestSeriesDetails2Screen(
             )
         }
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
             if (testSeriesDetailsState != null) {
                 LazyColumn(modifier = Modifier.padding(16.dp)) {
                     items(testSeriesDetailsState?.ar ?: emptyList()) { test ->
-                        TestDetailsCard(test, navController,emailId)
+                        TestDetailsCard(
+                            test, navController, emailId, viewModel,
+                            examId, examPostId, tierId, productId, examModeId, errorMessage
+                        )
                     }
                 }
             } else {
@@ -70,11 +84,33 @@ fun TestSeriesDetails2Screen(
     }
 }
 
-
-
-
 @Composable
-fun TestDetailsCard(test: AR, navController: NavController,emailId:String) {
+fun TestDetailsCard(
+    test: AR,
+    navController: NavController,
+    emailId: String,
+    viewModel: TestSeriesDetails2ViewModel,
+    examId: Int,
+    examPostId: Int,
+    tierId: String,
+    productId: Int,
+    examModeId: Int,
+    errorMessage: String?
+) {
+    val userStatus by viewModel.userStatus.collectAsState()
+
+    LaunchedEffect(Unit) {
+        val accessRequest = TestSeriesAccessRequest(
+            email_id = emailId,
+            exam_id = examId,
+            post_id = examPostId,
+            tier_id = tierId,
+            exam_mode_id = examModeId,
+            product_id = productId
+        )
+        viewModel.checkTestSeriesAccess(listOf(accessRequest))
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -82,8 +118,6 @@ fun TestDetailsCard(test: AR, navController: NavController,emailId:String) {
         elevation = 4.dp,
         backgroundColor = Color(0xFFD6EAF8)
     ) {
-
-
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -95,23 +129,92 @@ fun TestDetailsCard(test: AR, navController: NavController,emailId:String) {
                 Spacer(modifier = Modifier.weight(1f))
             }
 
-            OutlinedButton(
-                onClick = {
+            Text(
+                text = "Email ID: $emailId",
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+            Text(
+                text = "Exam ID: $examId",
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+            Text(
+                text = "Post ID: $examPostId",
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+            Text(
+                text = "Tier ID: $tierId",
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+            Text(
+                text = "Product ID: $productId",
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+            Text(
+                text = "Exam Mode ID: $examModeId",
+                fontWeight = FontWeight.Normal,
+                fontSize = 14.sp,
+                color = Color.Black
+            )
+            Text(
+                text = "User Status: ${userStatus ?: "Loading..."}",
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = Color.Red
+            )
 
-                    navController.navigate("instructions_screen/${test.Title}/${test.Marks}/${test.Time}/${test.test_series_id}/${test.paper_code}/${test.exam_mode_id}/${test.Questions}/${emailId}")
-                },
-                border = BorderStroke(1.dp, Color(0xFF8E44AD)),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = Color.Transparent,
-                    contentColor = Color(0xFF8E44AD)
-                ),
-                modifier = Modifier.height(30.dp)
-            ) {
+            if (errorMessage != null) {
                 Text(
-                    text = "Attempt",
-                    color = Color(0xFF8E44AD),
-                    fontSize = 12.sp
+                    text = "Error: $errorMessage",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = Color.Red
                 )
+            }
+
+            if (userStatus == 0) {
+                OutlinedButton(
+                    onClick = {
+                        navController.navigate("instructions_screen/${test.Title}/${test.Marks}/${test.Time}/${test.test_series_id}/${test.paper_code}/${test.exam_mode_id}/${test.Questions}/${emailId}")
+                    },
+                    border = BorderStroke(1.dp, Color(0xFF8E44AD)),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        backgroundColor = Color.Transparent,
+                        contentColor = Color(0xFF8E44AD)
+                    ),
+                    modifier = Modifier.height(30.dp)
+                ) {
+                    Text(
+                        text = "Attempt",
+                        color = Color(0xFF8E44AD),
+                        fontSize = 12.sp
+                    )
+                }
+            } else {
+                OutlinedButton(
+                    onClick = { /* Handle unlock action */ },
+                    border = BorderStroke(1.dp, Color(0xFF8E44AD)),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        backgroundColor = Color.Transparent,
+                        contentColor = Color(0xFF8E44AD)
+                    ),
+                    modifier = Modifier.height(30.dp)
+                ) {
+                    Text(
+                        text = "Unlock",
+                        color = Color(0xFF8E44AD),
+                        fontSize = 12.sp
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -143,7 +246,6 @@ fun TestDetailsCard(test: AR, navController: NavController,emailId:String) {
     }
 }
 
-
 @Composable
 fun InfoIconWithText(iconId: Int, text: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -160,4 +262,3 @@ fun InfoIconWithText(iconId: Int, text: String) {
         )
     }
 }
-

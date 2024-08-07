@@ -44,72 +44,111 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
             val emailId = backStackEntry.arguments?.getString("emailId") ?: ""
             TestPassScreen(navController = navController, emailId = emailId, testPassViewModel = testPassViewModel)
         }
+
         composable(
-            route = "individual_exam_test_pass/{productId}/{emailId}",
+            route = "individual_exam_test_pass/{id}/{email}",
             arguments = listOf(
-                navArgument("productId") { type = NavType.IntType },
-                navArgument("emailId") { type = NavType.StringType }
+                navArgument("id") { type = NavType.IntType },
+                navArgument("email") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val productId = backStackEntry.arguments?.getInt("productId") ?: 0
-            val emailId = backStackEntry.arguments?.getString("emailId") ?: ""
-            IndividualExamTestPassScreen(productId = productId, emailId = emailId, viewModel = individualExamTestPassViewModel, navController = navController)
+            val id = backStackEntry.arguments?.getInt("id") ?: 0
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            IndividualExamTestPassScreen(
+                productId = id,
+                emailId = email,
+                viewModel = individualExamTestPassViewModel,
+                navController = navController
+            )
         }
+
+
         composable(
-            route = "new_tests_web_screen/{examPostId}/{examId}/{tierId}/{emailId}",
+            route = "new_tests_web_screen/{examPostId}/{examId}/{tierId}/{emailId}/{productId}",
             arguments = listOf(
                 navArgument("examPostId") { type = NavType.IntType },
                 navArgument("examId") { type = NavType.IntType },
                 navArgument("tierId") { type = NavType.IntType },
-                navArgument("emailId") { type = NavType.StringType }
+                navArgument("emailId") { type = NavType.StringType },
+                navArgument("productId") { type = NavType.IntType } // Change to IntType if productId is an Int
             )
         ) { backStackEntry ->
             val examPostId = backStackEntry.arguments?.getInt("examPostId") ?: 0
             val examId = backStackEntry.arguments?.getInt("examId") ?: 0
             val tierId = backStackEntry.arguments?.getInt("tierId") ?: 0
             val emailId = backStackEntry.arguments?.getString("emailId") ?: ""
+            val productId = backStackEntry.arguments?.getInt("productId") ?: 0 // Change to getInt if productId is an Int
             NewTestsWebScreen(
                 emailId = emailId,
                 examPostId = examPostId.toString(),
                 examId = examId.toString(),
                 tierId = tierId.toString(),
+                productId = productId.toString(),
                 viewModel = newTestsWebViewModel,
                 navController = navController
             )
         }
+
+
         composable(
-            route = "test_series_screen/{emailId}/{tierId}/{examModeId}",
+            route = "test_series_screen/{emailId}/{tierId}/{examModeId}/{examId}/{examPostId}/{productId}",
             arguments = listOf(
                 navArgument("emailId") { type = NavType.StringType },
                 navArgument("tierId") { type = NavType.StringType },
-                navArgument("examModeId") { type = NavType.IntType }
+                navArgument("examModeId") { type = NavType.IntType },
+                navArgument("examId") { type = NavType.IntType },
+                navArgument("examPostId") { type = NavType.IntType },
+                navArgument("productId") { type = NavType.IntType }
             )
         ) { backStackEntry ->
             val emailId = backStackEntry.arguments?.getString("emailId") ?: ""
             val tierId = backStackEntry.arguments?.getString("tierId") ?: ""
             val examModeId = backStackEntry.arguments?.getInt("examModeId") ?: 0
+            val examId = backStackEntry.arguments?.getInt("examId") ?: 0
+            val examPostId = backStackEntry.arguments?.getInt("examPostId") ?: 0
+            val productId = backStackEntry.arguments?.getInt("productId") ?: 0
             TestSeriesScreen(
                 emailId = emailId,
                 tierId = tierId,
                 examModeId = examModeId,
+                examId = examId,
+                examPostId = examPostId,
+                productId = productId,
                 navController = navController
             )
         }
+
         composable(
-            route = "test_series_details2_screen/{testSeriesId}/{emailId}",
+            route = "test_series_details2_screen/{testSeriesId}/{emailId}/{examId}/{examPostId}/{tierId}/{productId}/{examModeId}",
             arguments = listOf(
                 navArgument("testSeriesId") { type = NavType.StringType },
-                navArgument("emailId") { type = NavType.StringType }
+                navArgument("emailId") { type = NavType.StringType },
+                navArgument("examId") { type = NavType.IntType },
+                navArgument("examPostId") { type = NavType.IntType },
+                navArgument("tierId") { type = NavType.StringType },
+                navArgument("productId") { type = NavType.IntType },
+                navArgument("examModeId") { type = NavType.IntType }
             )
         ) { backStackEntry ->
-            val emailId = backStackEntry.arguments?.getString("emailId") ?: ""
             val testSeriesId = backStackEntry.arguments?.getString("testSeriesId") ?: ""
+            val emailId = backStackEntry.arguments?.getString("emailId") ?: ""
+            val examId = backStackEntry.arguments?.getInt("examId") ?: 0
+            val examPostId = backStackEntry.arguments?.getInt("examPostId") ?: 0
+            val tierId = backStackEntry.arguments?.getString("tierId") ?: ""
+            val productId = backStackEntry.arguments?.getInt("productId") ?: 0
+            val examModeId = backStackEntry.arguments?.getInt("examModeId") ?: 0
             TestSeriesDetails2Screen(
-                emailId = emailId,
                 testSeriesId = testSeriesId,
+                emailId = emailId,
+                examId = examId,
+                examPostId = examPostId,
+                tierId = tierId,
+                productId = productId,
+                examModeId = examModeId,
                 navController = navController
             )
         }
+
         composable(
             route = "data_screen/{testSeriesId}/{paperCode}/{examModeId}/{emailId}",
             arguments = listOf(

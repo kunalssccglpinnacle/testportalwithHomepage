@@ -459,6 +459,7 @@ data class LoginData(
     @SerializedName("__v") val version: Int
 )
 
+
 data class PauseTestRequest(
     val email_id: String,
     val paper_code: String,
@@ -480,17 +481,31 @@ data class PauseTestResponse(
     val pause_question: Int
 )
 
-
-// To resume test
 data class PauseQuestionResponse(
     val pause_question: Int
 )
+data class TestSeriesAccessRequest(
+    val email_id: String,
+    val exam_id: Int,
+    val post_id: Int,
+    val tier_id: String,
+    val exam_mode_id: Int,
+    val product_id: Int
+)
 
-
-
-
-
+data class TestSeriesAccessResponse(
+    val user_status: Int
+)
 interface ApiService {
+
+
+    @POST("/testSeriesAccess")
+    suspend fun checkTestSeriesAccess(@Body request: List<TestSeriesAccessRequest>): TestSeriesAccessResponse
+    @POST("/pauseQuestion")
+    suspend fun getPausedQuestion(@Body request: FetchDataRequest): PauseQuestionResponse
+
+    @POST("/pauseTest")
+    suspend fun pauseTest(@Body request: PauseTestRequest): PauseTestResponse
 
     @Headers("Content-Type: application/json")
     @POST("api/v1/users/mobileVerification")
@@ -500,9 +515,12 @@ interface ApiService {
     @POST("api/v1/users/mobileOtpVerificationReport")
     suspend fun verifyOtp(@Body request: OtpVerificationRequest): OtpVerificationResponse
 
+
     @Headers("Content-Type: application/json")
     @POST("api/v1/users/emailVerification")
     suspend fun sendEmailVerification(@Body request: EmailVerificationRequest): EmailVerificationResponse
+
+
 
     @POST("api/v1/users/emailVerificationAfterMobile")
     suspend fun emailVerificationAfterMobile(@Body request: EmailVerificationAfterMobileRequest): ApiResponse
@@ -558,12 +576,6 @@ interface ApiService {
 
     @POST("solution")
     suspend fun fetchSolutionData(@Body request: SolutionRequest): List<SolutionResponse>
-
-    @POST("/pauseTest")
-    suspend fun pauseTest(@Body request: PauseTestRequest): PauseTestResponse
-
-    @POST("/pauseQuestion")
-    suspend fun getPausedQuestion(@Body request: FetchDataRequest): PauseQuestionResponse
 
 }
 
