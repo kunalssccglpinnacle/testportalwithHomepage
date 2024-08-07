@@ -48,7 +48,7 @@ class TestSeriesDetails2ViewModel(private val repository: TestRepository) : View
                 _userStatus.value = response.user_status
                 _errorMessage.value = null
             } catch (e: Exception) {
-                _userStatus.value = 1
+               _userStatus.value = 0
                 _errorMessage.value = e.message
             }
         }
