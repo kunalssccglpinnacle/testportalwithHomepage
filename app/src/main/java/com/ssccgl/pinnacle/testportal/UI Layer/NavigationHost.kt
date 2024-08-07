@@ -15,6 +15,7 @@ import com.ssccgl.pinnacle.testportal.network.SolutionRequest
 import com.ssccgl.pinnacle.testportal.repository.TestRepository
 import com.ssccgl.pinnacle.testportal.testPortal.Viewmodel.IndividualExamTestPassViewModel2
 import com.ssccgl.pinnacle.testportal.testPortal.Viewmodel.NewTestsWebViewModel
+import com.ssccgl.pinnacle.testportal.testPortal.ui.SolutionScreen
 import com.ssccgl.pinnacle.testportal.viewmodel.*
 
 @Composable

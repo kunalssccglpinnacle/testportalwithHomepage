@@ -459,26 +459,14 @@ data class LoginData(
     @SerializedName("__v") val version: Int
 )
 
-data class TestSeriesAccessRequest(
-    val email_id: String,
-    val exam_id: Int,
-    val post_id: Int,
-    val tier_id: String,
-    val exam_mode_id: Int,
-    val product_id: Int
-)
 
-data class TestSeriesAccessResponse(
-    val user_status: Int
-)
 
 
 
 
 interface ApiService {
 
-    @POST("/testSeriesAcces")
-    suspend fun checkTestSeriesAccess(@Body request: List<TestSeriesAccessRequest>): TestSeriesAccessResponse
+
 
     @Headers("Content-Type: application/json")
     @POST("api/v1/users/mobileVerification")
@@ -552,10 +540,11 @@ interface ApiService {
 
 }
 
-
 object RetrofitInstance {
     val api: ApiService by lazy {
         Retrofit.Builder()
+           // .baseUrl("http://3.111.199.93:5000/")
+
             .baseUrl("https://onlineexam.ssccglpinnacle.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
