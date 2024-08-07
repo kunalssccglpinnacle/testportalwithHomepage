@@ -2,13 +2,15 @@
 package com.ssccgl.pinnacle.testportal.viewmodel
 
 import androidx.lifecycle.*
+import com.ssccgl.pinnacle.testportal.network.AttemptedRequest
+import com.ssccgl.pinnacle.testportal.network.AttemptedResponse
 import com.ssccgl.pinnacle.testportal.network.SolutionRequest
 import com.ssccgl.pinnacle.testportal.network.RetrofitInstance
 import com.ssccgl.pinnacle.testportal.network.SolutionResponse
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.StateFlow
 
 class SolutionViewModel : ViewModel() {
 
@@ -26,6 +28,13 @@ class SolutionViewModel : ViewModel() {
 
     private val selectedOptions = mutableMapOf<Int, String>()
 
+    private val _selectedTabIndex = MutableStateFlow(0)
+    val selectedTabIndex: LiveData<Int> = _selectedTabIndex.asLiveData()
+
+    private val _attemptedResponse = MutableStateFlow<AttemptedResponse?>(null)
+    val attemptedResponse: StateFlow<AttemptedResponse?> = _attemptedResponse
+
+
     fun fetchSolutionData(request: SolutionRequest) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -33,7 +42,7 @@ class SolutionViewModel : ViewModel() {
                 _solutionData.value = response
 
                 response.flatMap { it.details }.forEach { detail ->
-                    selectedOptions[detail.qid] = detail.choose_answer?.takeIf { it.isNotBlank() } ?: ""
+                    selectedOptions[detail.qid] = detail.choose_answer.takeIf { it.isNotBlank() } ?: ""
                 }
 
                 response.firstOrNull()?.details?.firstOrNull()?.qid?.let {
@@ -45,6 +54,25 @@ class SolutionViewModel : ViewModel() {
                 _error.value = e.message
             }
         }
+    }
+
+    fun fetchAttemptedData( request: AttemptedRequest) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.fetchAttempted(request)
+                _attemptedResponse.value = response.firstOrNull() // Assuming the response is a list and you need the first item
+            } catch (e: Exception) {
+                _error.value = e.message
+            }
+        }
+    }
+
+    fun moveToSection(index: Int) {
+        val selectedSubject = _solutionData.value.flatMap {it.subjects} [index]
+        val newQuestionId = _solutionData.value.flatMap {it.details}
+            .find {it.subject_id == selectedSubject.sb_id && it.qid == selectedSubject.ppr_id}?.qid ?: 1
+        moveToQuestion(newQuestionId)
+        _selectedTabIndex.value = index
     }
 
     private fun setSelectedOption(questionId: Int) {
@@ -65,7 +93,8 @@ class SolutionViewModel : ViewModel() {
 
     fun moveToNextQuestion() {
         val nextQuestionId = _currentQuestionId.value + 1
-        if (nextQuestionId <= _solutionData.value.flatMap { it.details }.maxOfOrNull { it.qid } ?: 0) {
+        if (nextQuestionId <= (_solutionData.value.flatMap { it.details }.maxOfOrNull { it.qid }
+                ?: 0)) {
             _currentQuestionId.value = nextQuestionId
             setSelectedOption(nextQuestionId)
         }

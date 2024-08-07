@@ -1,4 +1,3 @@
-
 package com.ssccgl.pinnacle.testportal.viewmodel
 
 import androidx.lifecycle.ViewModel
