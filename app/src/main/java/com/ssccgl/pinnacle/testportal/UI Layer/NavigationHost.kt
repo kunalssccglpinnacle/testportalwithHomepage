@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.NavType
+import com.ssccgl.pinnacle.testportal.network.AttemptedRequest
 import com.ssccgl.pinnacle.testportal.network.LoginData
 import com.ssccgl.pinnacle.testportal.network.RetrofitInstance
 import com.ssccgl.pinnacle.testportal.network.SolutionRequest
@@ -207,7 +208,8 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
             val testSeriesId = backStackEntry.arguments?.getString("testSeriesId") ?: ""
             if (paperCode.isNotBlank() && emailId.isNotBlank() && examModeId.isNotBlank() && testSeriesId.isNotBlank()) {
                 val request = SolutionRequest(paperCode, emailId, examModeId, testSeriesId)
-                SolutionScreen(viewModel = solutionViewModel, request = request)
+                val request1 = AttemptedRequest(paperCode, emailId, examModeId, testSeriesId)
+                SolutionScreen(viewModel = solutionViewModel, request = request, request1 = request1)
             } else {
                 Text("Error: Missing or invalid arguments")
             }

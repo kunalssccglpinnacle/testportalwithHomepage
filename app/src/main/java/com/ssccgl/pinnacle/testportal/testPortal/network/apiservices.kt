@@ -339,17 +339,17 @@ data class SolutionResponse(
 )
 
 data class Subjectsol(
-    val sbId: Int,
-    val pprId: Int,
-    val subjectName: String
+    val sb_id: Int,
+    val ppr_id: Int,
+    val subject_name: String
 )
 
 data class Detailsol(
     val qid: Int,
-    val questionId: Int,
-    val subId: Int,
+    val question_id: Int,
+    val sub_id: Int,
     val subPrvId: Int,
-    val subjectId: Int,
+    val subject_id: Int,
     val question: String,
     val option1: String,
     val option2: String,

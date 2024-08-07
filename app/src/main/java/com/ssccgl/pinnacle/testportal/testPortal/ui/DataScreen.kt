@@ -268,7 +268,8 @@ fun DataScreen(
                             }
                         }
                     }
-                } else {
+                }
+                else {
                     // Full View
                     LazyColumn(
                         modifier = Modifier
