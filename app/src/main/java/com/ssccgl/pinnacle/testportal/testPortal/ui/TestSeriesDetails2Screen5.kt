@@ -181,7 +181,7 @@ fun TestDetailsCard(
                 )
             }
 
-            if (userStatus == 1) {
+            if (userStatus == 0) {
                 OutlinedButton(
                     onClick = {
                         navController.navigate("instructions_screen/${test.Title}/${test.Marks}/${test.Time}/${test.test_series_id}/${test.paper_code}/${test.exam_mode_id}/${test.Questions}/${emailId}")

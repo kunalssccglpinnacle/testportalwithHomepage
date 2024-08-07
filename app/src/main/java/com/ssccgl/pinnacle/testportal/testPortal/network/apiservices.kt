@@ -460,13 +460,52 @@ data class LoginData(
 )
 
 
+data class PauseTestRequest(
+    val email_id: String,
+    val paper_code: String,
+    val exam_mode_id: String,
+    val test_series_id: String,
+    val rTem: String,
+    val pause_question: Int
+)
 
+data class PauseTestResponse(
+    val _id: String,
+    val id: Int,
+    val email_id: String,
+    val exam_mode_id: Int,
+    val test_series_id: Int,
+    val paper_code: String,
+    val status: Int,
+    val remaining_time: String,
+    val pause_question: Int
+)
 
+data class PauseQuestionResponse(
+    val pause_question: Int
+)
+data class TestSeriesAccessRequest(
+    val email_id: String,
+    val exam_id: Int,
+    val post_id: Int,
+    val tier_id: String,
+    val exam_mode_id: Int,
+    val product_id: Int
+)
 
-
+data class TestSeriesAccessResponse(
+    val user_status: Int
+)
 interface ApiService {
 
 
+    @POST("/testSeriesAccess")
+    suspend fun checkTestSeriesAccess(@Body request: List<TestSeriesAccessRequest>): TestSeriesAccessResponse
+    @POST("/pauseQuestion")
+    suspend fun getPausedQuestion(@Body request: FetchDataRequest): PauseQuestionResponse
+
+    @POST("/pauseTest")
+    suspend fun pauseTest(@Body request: PauseTestRequest): PauseTestResponse
 
     @Headers("Content-Type: application/json")
     @POST("api/v1/users/mobileVerification")
