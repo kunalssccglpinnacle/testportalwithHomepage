@@ -150,18 +150,20 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
         }
 
         composable(
-            route = "data_screen/{testSeriesId}/{paperCode}/{examModeId}/{emailId}",
+            route = "data_screen/{testSeriesId}/{paperCode}/{examModeId}/{emailId}/{selectedLanguage}",
             arguments = listOf(
                 navArgument("testSeriesId") { type = NavType.StringType },
                 navArgument("paperCode") { type = NavType.StringType },
                 navArgument("examModeId") { type = NavType.IntType },
-                navArgument("emailId") { type = androidx.navigation.NavType.StringType }
+                navArgument("emailId") { type = androidx.navigation.NavType.StringType },
+                navArgument("selectedLanguage") { type = androidx.navigation.NavType.StringType }
             )
         ) { backStackEntry ->
             val emailId = backStackEntry.arguments?.getString("emailId") ?: ""
             val testSeriesId = backStackEntry.arguments?.getString("testSeriesId") ?: ""
             val paperCode = backStackEntry.arguments?.getString("paperCode") ?: ""
             val examModeId = backStackEntry.arguments?.getInt("examModeId") ?: 0
+            val selectedLanguage = backStackEntry.arguments?.getString("selectedLanguage") ?: "English"
             val viewModelFactory = MainViewModelFactory(
                 paperCode,
                 emailId = emailId,
@@ -174,6 +176,7 @@ fun NavigationHost(navController: NavHostController, homeViewModel: HomeViewMode
                 examModeId = examModeId,
                 navController = navController,
                 emailId = emailId,
+                selectedLanguage = selectedLanguage,
                 viewModel = viewModel(factory = viewModelFactory)
             )
         }

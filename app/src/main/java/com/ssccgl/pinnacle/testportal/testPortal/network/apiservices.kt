@@ -109,6 +109,10 @@ data class Detail(
     val option3: String,
     val option4: String,
     val hindi_question: String,
+    val option1_hindi: String,
+    val option2_hindi: String,
+    val option3_hindi: String,
+    val option4_hindi: String,
     val positive_marks: String,
     val negative_marks: Double,
     val answered_ques: Int,
@@ -539,10 +543,6 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("api/v1/users/login")
     suspend fun loginWithMobile(@Body request: MobileLoginRequest): LoginResponse
-
-
-
-
 
     @GET("testpass")
     suspend fun getTestPasses(): List<TestPass>
