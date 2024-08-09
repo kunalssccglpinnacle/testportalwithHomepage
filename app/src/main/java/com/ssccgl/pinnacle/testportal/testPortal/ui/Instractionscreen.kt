@@ -107,9 +107,18 @@ fun InstructionsScreen(
                     Text(text = "Please select a language and agree to the declaration.", color = Red)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
+//                Button(onClick = {
+//                    if (selectedLanguage.value != "Select" && checked) {
+//                        navController.navigate("data_screen/$testSeriesId/$paperCode/$examModeId/$emailId")
+//                    } else {
+//                        showError = true
+//                    }
+//                }) {
+//                    Text(text = "Agree and Continue")
+//                }
                 Button(onClick = {
                     if (selectedLanguage.value != "Select" && checked) {
-                        navController.navigate("data_screen/$testSeriesId/$paperCode/$examModeId/$emailId")
+                        navController.navigate("data_screen/$testSeriesId/$paperCode/$examModeId/$emailId/${selectedLanguage.value}")
                     } else {
                         showError = true
                     }

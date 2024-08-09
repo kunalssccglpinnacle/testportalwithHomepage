@@ -41,6 +41,7 @@ fun DataScreen(
     paperCode: String,
     examModeId: Int,
     navController: NavHostController,
+    selectedLanguage: String,
     viewModel: MainViewModel = viewModel()
 ) {
     val data by viewModel.data.observeAsState(emptyList())
@@ -71,10 +72,29 @@ fun DataScreen(
     var showPauseDialog by remember { mutableStateOf(false) }
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabTitles = listOf("Sectional View", "Full View")
+//    var isHindi by remember { mutableStateOf(false) }
+    var isHindi by remember { mutableStateOf(selectedLanguage == "Hindi") } // Set isHindi based on selectedLanguage
 
     BackHandler {
         showPauseDialog = true
     }
+
+    LaunchedEffect(Pair(isDataDisplayed, currentQuestionId)) {
+        if (isDataDisplayed) {
+            val currentQuestion = details.find { it.qid == currentQuestionId }
+            if (currentQuestion != null) {
+                viewModel.saveCurrentQuestionState(currentQuestionId, selectedOption, elapsedTime)
+                viewModel.initializeElapsedTime(currentQuestionId)
+                viewModel.setSelectedOption(currentQuestionId)
+                if (!countdownStarted) {
+                    viewModel.startCountdown(navController)
+                }
+                // Update isHindi based on the subject_id
+                isHindi = if (currentQuestion.subject_id == 7) false else (selectedLanguage == "Hindi")
+            }
+        }
+    }
+
 
     LaunchedEffect(Pair(isDataDisplayed, currentQuestionId)) {
         if (isDataDisplayed) {
@@ -331,6 +351,17 @@ fun DataScreen(
                     TopAppBar(
                         title = { Text(title) },
                         actions = {
+//                            IconButton(onClick = { isHindi = !isHindi }) {
+//                                Text(if (isHindi) "EN" else "HI")
+//                            }
+                            IconButton(onClick = {
+                                if (details.find { it.qid == currentQuestionId }?.subject_id != 7) {
+                                    isHindi = !isHindi
+                                }
+                            }) {
+                                Text(if (isHindi) "EN" else "HI")
+                            }
+
                             IconButton(onClick = { coroutineScope.launch { drawerState.open() } }) {
                                 Icon(imageVector = Icons.Default.Menu, contentDescription = "Open Drawer")
                             }
@@ -454,28 +485,30 @@ fun DataScreen(
                                         verticalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         item {
-                                            HtmlText(html = currentQuestion.question)
+                                            val questionHtml =
+                                                if (isHindi) currentQuestion.hindi_question else currentQuestion.question
+                                            HtmlText(html = questionHtml ?: "Question not available")
                                             Spacer(modifier = Modifier.height(16.dp))
                                             OptionItem(
-                                                option = currentQuestion.option1,
+                                                option = if (isHindi) currentQuestion.option1_hindi else currentQuestion.option1,
                                                 optionValue = "a",
                                                 selectedOption = selectedOption,
                                                 onSelectOption = { viewModel.updateSelectedOption(it) }
                                             )
                                             OptionItem(
-                                                option = currentQuestion.option2,
+                                                option = if (isHindi) currentQuestion.option2_hindi else currentQuestion.option2,
                                                 optionValue = "b",
                                                 selectedOption = selectedOption,
                                                 onSelectOption = { viewModel.updateSelectedOption(it) }
                                             )
                                             OptionItem(
-                                                option = currentQuestion.option3,
+                                                option = if (isHindi) currentQuestion.option3_hindi else currentQuestion.option3,
                                                 optionValue = "c",
                                                 selectedOption = selectedOption,
                                                 onSelectOption = { viewModel.updateSelectedOption(it) }
                                             )
                                             OptionItem(
-                                                option = currentQuestion.option4,
+                                                option = if (isHindi) currentQuestion.option4_hindi else currentQuestion.option4,
                                                 optionValue = "d",
                                                 selectedOption = selectedOption,
                                                 onSelectOption = { viewModel.updateSelectedOption(it) }
