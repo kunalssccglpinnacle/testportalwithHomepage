@@ -523,7 +523,7 @@ fun SolutionScreen(
                         title = { Text("Solution") },
                         actions = {
                             IconButton(onClick = { isHindi = !isHindi }) {
-                                Text(if (isHindi) "EN" else "HI")
+                                Text(if (isHindi) "ENGLISH" else "HINDI")
                             }
                             IconButton(onClick = {
                                 coroutineScope.launch { drawerState.open() }

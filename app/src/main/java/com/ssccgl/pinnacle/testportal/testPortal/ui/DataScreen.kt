@@ -339,13 +339,13 @@ fun DataScreen(
                             }
                         }
                     )
-                    Text(
-                        text = "Email: $emailId",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = Color.Black,
-                        modifier = Modifier.padding(16.dp)
-                    )
+//                    Text(
+//                        text = "Email: $emailId",
+//                        fontWeight = FontWeight.Bold,
+//                        fontSize = 16.sp,
+//                        color = Color.Black,
+//                        modifier = Modifier.padding(16.dp)
+//                    )
                 },
                 bottomBar = {
                     val currentQuestion = details.find { it.qid == currentQuestionId }
