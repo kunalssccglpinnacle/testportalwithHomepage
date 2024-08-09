@@ -81,7 +81,7 @@ data class AR(
     val Marks: String,
     val Time: String,
     val Title: String,
-    val PaperStatus: String,
+    var PaperStatus: String,
     val RemainingTime: String,
     val languages: String,
     val expire_date: String,
@@ -89,7 +89,7 @@ data class AR(
     val paid_status: Int,
     val start_date: String,
     val start_time: String,
-    val free_status: String
+    var free_status: String
 )
 
 // Data classes for index

@@ -97,6 +97,7 @@ fun TestDetailsCard(
     examModeId: Int,
     errorMessage: String?
 ) {
+
     val userStatus by viewModel.userStatus.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -129,75 +130,70 @@ fun TestDetailsCard(
                 Spacer(modifier = Modifier.weight(1f))
             }
 
-            Text(
-                text = "Email ID: $emailId",
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                color = Color.Black
-            )
-            Text(
-                text = "Exam ID: $examId",
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                color = Color.Black
-            )
-            Text(
-                text = "Post ID: $examPostId",
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                color = Color.Black
-            )
-            Text(
-                text = "Tier ID: $tierId",
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                color = Color.Black
-            )
-            Text(
-                text = "Product ID: $productId",
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                color = Color.Black
-            )
-            Text(
-                text = "Exam Mode ID: $examModeId",
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp,
-                color = Color.Black
-            )
-            Text(
-                text = "User Status: ${userStatus ?: "Loading..."}",
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = Color.Red
-            )
-
-            if (errorMessage != null) {
-                Text(
-                    text = "Error: $errorMessage",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = Color.Red
-                )
-            }
 
             if (userStatus == 1) {
-                OutlinedButton(
-                    onClick = {
-                        navController.navigate("instructions_screen/${test.Title}/${test.Marks}/${test.Time}/${test.test_series_id}/${test.paper_code}/${test.exam_mode_id}/${test.Questions}/${emailId}")
-                    },
-                    border = BorderStroke(1.dp, Color(0xFF8E44AD)),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        backgroundColor = Color.Transparent,
-                        contentColor = Color(0xFF8E44AD)
-                    ),
-                    modifier = Modifier.height(30.dp)
-                ) {
-                    Text(
-                        text = "Attempt",
-                        color = Color(0xFF8E44AD),
-                        fontSize = 12.sp
-                    )
+                when (test.PaperStatus.toInt()) {
+                    2 -> {
+                        OutlinedButton(
+                            onClick = {
+                                navController.navigate("instructions_screen/${test.Title}/${test.Marks}/${test.Time}/${test.test_series_id}/${test.paper_code}/${test.exam_mode_id}/${test.Questions}/${emailId}")
+                            },
+                            border = BorderStroke(1.dp, Color(0xFF8E44AD)),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                backgroundColor = Color.Transparent,
+                                contentColor = Color(0xFF8E44AD)
+                            ),
+                            modifier = Modifier.height(30.dp)
+                        ) {
+                            Text(
+                                text = "Start Test",
+                                color = Color(0xFF8E44AD),
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                    1 -> {
+                        OutlinedButton(
+                            onClick = {
+                                navController.navigate(
+                                    "result_screen/${test.paper_code}/${emailId}/${examModeId}/${test.test_series_id}"
+                                )
+//                                navController.navigate("result_screen/${test.Title}/${test.test_series_id}/${test.paper_code}/${test.exam_mode_id}/${emailId}")
+                            },
+                            border = BorderStroke(1.dp, Color(0xFF8E44AD)),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                backgroundColor = Color.Transparent,
+                                contentColor = Color(0xFF8E44AD)
+                            ),
+                            modifier = Modifier.height(30.dp)
+                        ) {
+                            Text(
+                                text = "View Result",
+                                color = Color(0xFF8E44AD),
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                    else -> {
+                        OutlinedButton(
+                            onClick = {
+                                navController.navigate("instructions_screen/${test.Title}/${test.Marks}/${test.Time}/${test.test_series_id}/${test.paper_code}/${test.exam_mode_id}/${test.Questions}/${emailId}")
+//                                navController.navigate("resume_screen/${test.Title}/${test.test_series_id}/${test.paper_code}/${test.exam_mode_id}/${emailId}")
+                            },
+                            border = BorderStroke(1.dp, Color(0xFF8E44AD)),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                backgroundColor = Color.Transparent,
+                                contentColor = Color(0xFF8E44AD)
+                            ),
+                            modifier = Modifier.height(30.dp)
+                        ) {
+                            Text(
+                                text = "Resume Test",
+                                color = Color(0xFF8E44AD),
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
                 }
             } else {
                 OutlinedButton(
@@ -237,8 +233,8 @@ fun TestDetailsCard(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = if (test.free_status == "1") "Free Mock" else "(${test.start_date} ${test.start_time})",
-                    color = if (test.free_status == "1") Color.Red else Color.Black,
+                    text = if (test.free_status == "0") "Free Mock" else "(${test.start_date} ${test.start_time})",
+                    color = if (test.free_status == "1") Color.Blue else Color.Black,
                     fontSize = 14.sp
                 )
             }
@@ -262,3 +258,4 @@ fun InfoIconWithText(iconId: Int, text: String) {
         )
     }
 }
+
