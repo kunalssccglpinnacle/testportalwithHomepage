@@ -7,6 +7,7 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -15,7 +16,7 @@ import com.ssccgl.pinnacle.testportal.R
 import kotlinx.coroutines.launch
 
 @Composable
-fun TopAppBarWithDrawerButton(scaffoldState: ScaffoldState) {
+fun TopAppBarWithDrawerButton(scaffoldState: ScaffoldState, onLogoutClick: () -> Unit) {
     TopAppBar(
         title = { Text("Pinnacle") },
         navigationIcon = {
@@ -27,6 +28,16 @@ fun TopAppBarWithDrawerButton(scaffoldState: ScaffoldState) {
             }) {
                 Icon(Icons.Default.Menu, contentDescription = "Menu")
             }
+        },
+
+
+        actions = {
+            IconButton(onClick = onLogoutClick) {
+                Icon(Icons.Default.ExitToApp, contentDescription = "Logout")
+            }
         }
+
+
+
     )
 }

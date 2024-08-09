@@ -1,3 +1,4 @@
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -50,53 +51,59 @@ android {
 }
 
 dependencies {
+    // Core Android dependencies
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.12.0")
 
-    androidTestImplementation ("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation ("androidx.test:runner:1.6.1")
-    testImplementation ("junit:junit:4.13.2")
-
-    implementation ("androidx.core:core-ktx:1.13.1")
-    implementation ("androidx.appcompat:appcompat:1.7.0")
-    implementation ("com.google.android.material:material:1.12.0")
-    implementation ("androidx.compose.ui:ui:1.6.8")
-    implementation ("androidx.compose.material:material:1.6.8")
-    implementation ("androidx.compose.ui:ui-tooling-preview:1.6.8")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
-    implementation ("androidx.navigation:navigation-compose:2.7.7")
-    implementation ("androidx.activity:activity-compose:1.9.0")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")
-
-    // Optional: For preview support
-    debugImplementation ("androidx.compose.ui:ui-tooling:1.6.8")
-
-    implementation ("androidx.compose.material3:material3:1.2.1")
-
+    // Compose
     implementation("androidx.compose.ui:ui:1.6.8")
-    implementation ("androidx.compose.material:material-icons-core:1.6.8")
-    implementation ("androidx.compose.material:material-icons-extended:1.6.8")
-    implementation ("androidx.compose.foundation:foundation:1.6.8")
+    implementation("androidx.compose.material:material:1.6.8")
+    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.6.8")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.6.8")
+    implementation("androidx.compose.material:material-icons-core:1.6.8")
+    implementation("androidx.compose.material:material-icons-extended:1.6.8")
+    implementation("androidx.compose.foundation:foundation:1.6.8")
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.8")
+
+    // Lifecycle and ViewModel
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
+
+    // Navigation
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    // Activity Compose
+    implementation("androidx.activity:activity-compose:1.9.1")
+
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")
+
+    // Security
+    implementation("androidx.security:security-crypto-ktx:1.0.0")
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
     // Retrofit for network calls
-    implementation ("com.squareup.retrofit2:retrofit:2.11.0")
-    // Gson converter for Retrofit
-    implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 
-    //implementation ("io.coil-kt:coil-compose:2.4.0")
+    // Image Loading with Coil
+    implementation("io.coil-kt:coil-compose:2.4.0")
 
-   // implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.6.0")
-    // Retrofit
-    //implementation ("com.squareup.re &#8203;:citation[oaicite:0]{index=0}&#8203")
+    // Testing
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test:runner:1.6.1")
+    testImplementation("junit:junit:4.13.2")
 
 
-    implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
-    implementation ("io.coil-kt:coil-compose:2.4.0")
+    // Replace this line with the correct version
+    implementation("androidx.security:security-crypto-ktx:1.1.0-alpha06")
 
-    implementation ("androidx.compose.runtime:runtime-livedata:1.6.8")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
-
-    // for graph
-  //  implementation ("com.github.tehras:charts:1.0.2")
-
+    // Other dependencies
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.compose.ui:ui:1.6.8")
 }
-
-

@@ -2,6 +2,7 @@
 
 package com.ssccgl.pinnacle.testportal.ui
 
+import LoginViewModel
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,9 +17,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ssccgl.pinnacle.testportal.viewmodel.LoginViewModel
+//import com.ssccgl.pinnacle.testportal.viewmodel.LoginViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel = viewModel()) {
@@ -105,7 +107,7 @@ fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel
                         onEmailChange = { email = it },
                         password = password,
                         onPasswordChange = { password = it },
-                        onLoginClick = { loginViewModel.login(email, password) }
+                        onLoginClick = { loginViewModel.login(email, password, context) }
                     )
                 }
 
@@ -178,6 +180,9 @@ fun LoginScreen(navController: NavHostController, loginViewModel: LoginViewModel
         )
     }
 }
+
+
+
 
 @Composable
 fun RegisterSection(
